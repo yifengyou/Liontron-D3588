@@ -150,7 +150,7 @@ jobs:
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           df -hT ${PWD}
-          git clone -q --single-branch --depth=1 --branch=master https://github.com/yifengyou/d3588.git d3588.git
+          git clone --recursive --single-branch --branch=master https://github.com/yifengyou/d3588.git d3588.git
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile D3588 kernel and uboot code
