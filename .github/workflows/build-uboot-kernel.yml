@@ -161,23 +161,24 @@ jobs:
           ls -alh
           du -sh *
           ./build.sh
+          echo "build_tag=D3588_UBOOT_KERNEL" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Upload Armbian image to Release
+      - name: Upload D3588 image to Release
         uses: ncipollo/release-action@main
         if: ${{ steps.compile_d3588.outputs.status }} == 'success' && !cancelled()
         with:
-          tag: ${{ steps.compile.outputs.build_tag }}
+          tag: ${{ steps.compile_d3588.outputs.build_tag }}
           artifacts: /builder/d3588.git/rockdev/*
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ### Armbian Image information
+            ### D3588 Image information
             - Default username: root
-            - Default password: 1234
-            - Install command: armbian-install
-            - Update command: armbian-update
+            - Default password: linux
+            - Install command: kdev-install
+            - Update command: kdev-update
             ### Armbian Image Verification
             - sha256sum
