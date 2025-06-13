@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         # 基础矩阵：发行版列表
-        set_release: [ bookworm, bullseye, jammy, noble ]
+        set_release: [ bullseye, bookworm, jammy, noble ]
         set_desktop: [ cli, gnome, xfce ]
 
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
@@ -128,7 +128,7 @@ jobs:
                        EXPERT=yes \
                        KERNEL_CONFIGURE=no \
                        COMPRESS_OUTPUTIMAGE="sha,img,xz" \
-                       VENDOR="kdev" \
+                       VENDOR="Armbian" \
                        SHARE_LOG=yes
           ls -alh /builder/armbian.git/output/images/
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -141,7 +141,12 @@ jobs:
           cp -a /builder/armbian.git/output/images/* /builder/d3588.git/rockdev/
           ls -alh /builder/d3588.git/rockdev/
           chmod +x ./d3588.git/extract-rootfs-from-armbian.sh
+          # generate /builder/d3588.git/rockdev/rootfs.img
           ./d3588.git/extract-rootfs-from-armbian.sh /builder/d3588.git/rockdev/
+          # generate rockdev.squashfs
+          cd /builder/d3588.git && mksquashfs rockdev rockdev.squashfs
+          mv rockdev.squashfs rockdev
+          # generate firmware.img
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload D3588 image to Release

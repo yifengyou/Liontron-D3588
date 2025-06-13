@@ -39,6 +39,5 @@ dd if=armbian.img of="${TARGET_DIR}/rootfs.img" \
 cd ${TARGET_DIR}
 ls -alh rootfs.img
 file rootfs.img
-xz -zv -9 rootfs.img
 
 
