@@ -1,8 +1,8 @@
 #==========================================================================
-# Description: Autobuild D3588 Armbian Image
+# Description: MatrixBuild D3588 Armbian Image
 #==========================================================================
 
-name: Autobuild D3588 Armbian Image
+name: MatrixBuild D3588 Armbian Image
 
 on:
   repository_dispatch:
@@ -15,19 +15,19 @@ env:
 
 jobs:
   build:
+    # using ubuntu 22.04 virtual machine environment
     runs-on: ubuntu-22.04
-
     strategy:
       matrix:
-        release: [bookworm, bullseye, jammy, noble]
+        set_release: [ bookworm, bullseye, jammy, noble ]
         include:
-          - release: bookworm
+          - set_release: bookworm
             distro_type: debian
-          - release: bullseye
+          - set_release: bullseye
             distro_type: debian
-          - release: jammy
+          - set_release: jammy
             distro_type: ubuntu
-          - release: noble
+          - set_release: noble
             distro_type: ubuntu
 
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
@@ -93,7 +93,6 @@ jobs:
           du -sh *
           ./build.sh
           ls -alh rockdev
-          echo "build_tag=D3588_Image" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download armbian source code
@@ -105,13 +104,13 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git armbian.git
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ inputs.set_release }} ]
+      - name: Compile Armbian [ ${{ matrix.set_release }} ]
         id: compile_armbian
         working-directory: /builder/armbian.git
         if: ${{ steps.down_armbian.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
-          echo "build_tag=Armbian_D3588_${{ inputs.set_release }}" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_D3588_${{ matrix.set_release }}" >> ${GITHUB_OUTPUT}
           ./compile.sh RELEASE=${{ matrix.release }} BOARD=nanopct6 BRANCH=current BUILD_MINIMAL=no \
                        BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                        COMPRESS_OUTPUTIMAGE="sha,img,xz" SHARE_LOG=yes
@@ -133,13 +132,13 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ steps.generate_rootfs.outputs.status }} == 'success' && !cancelled()
         with:
-          tag: ${{ steps.compile_d3588.outputs.build_tag }}
+          tag: ${{ steps.compile_armbian.outputs.build_tag }}
           artifacts: /builder/d3588.git/rockdev/*
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ### D3588 Image information
+            ### Armbian Image for D3588 information
             - Default username: root
-            - Default password: linux
+            - Default password: 123
