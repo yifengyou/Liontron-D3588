@@ -15,8 +15,8 @@ if [ ! -f "update.img" ]; then
 fi
 ./rkImageMaker -unpack update.img output || pause
 ./afptool -unpack output/firmware.img output || pause
-rm -f output/firmware.img
-rm -f output/boot.bin
+#rm -f output/firmware.img
+#rm -f output/boot.bin
 echo "Unpacking update.img OK."
 echo "Press any key to quit:"
 read -n1 -s key
