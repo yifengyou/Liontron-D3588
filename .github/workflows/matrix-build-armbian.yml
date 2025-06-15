@@ -193,7 +193,7 @@ jobs:
         if: ${{ steps.generate_rootfs.outputs.status }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile_armbian.outputs.build_tag }}
-          artifacts: /builder/d3588.git/release/
+          artifacts: /builder/d3588.git/release/*
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
