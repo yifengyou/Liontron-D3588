@@ -143,14 +143,16 @@ jobs:
           mkdir -p /builder/d3588.git/rockdev
           mkdir -p /builder/d3588.git/release
           # archive modules
-          cd /builder/d3588.git/rockdev && tar -zcvf modules.tar.gz modules && rm -rf modules
+          cd /builder/d3588.git/rockdev && tar -zcvf modules.tar.gz modules
           # generate rootfs.img in /builder/armbian.git/output/images/
           chmod +x /builder/d3588.git/extract-rootfs-from-armbian.sh
           /builder/d3588.git/extract-rootfs-from-armbian.sh /builder/armbian.git/output/images/
           mv /builder/armbian.git/output/images/rootfs.img /builder/d3588.git/rockdev/
-          # hack rootfs
+          # hack rootfs, must start with sudo
           sudo mount /builder/d3588.git/rockdev/rootfs.img /mnt
-          echo "tmpfs /tmp tmpfs defaults,nosuid 0 0" > /mnt/etc/fstab
+          sudo echo "tmpfs /tmp tmpfs defaults,nosuid 0 0" > /mnt/etc/fstab
+          sudo mkdir -p /mnt/lib/modules/kernel
+          sudo cp -a /builder/d3588.git/rockdev/modules/* /mnt/lib/modules/kernel/
           sync
           sudo umount /mnt
           # generate all in one updateable update.img
