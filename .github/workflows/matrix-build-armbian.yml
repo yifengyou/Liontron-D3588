@@ -148,6 +148,11 @@ jobs:
           chmod +x /builder/d3588.git/extract-rootfs-from-armbian.sh
           /builder/d3588.git/extract-rootfs-from-armbian.sh /builder/armbian.git/output/images/
           mv /builder/armbian.git/output/images/rootfs.img /builder/d3588.git/rockdev/
+          # hack rootfs
+          mount /builder/d3588.git/rockdev/rootfs.img /mnt
+          echo "tmpfs /tmp tmpfs defaults,nosuid 0 0" > /mnt/etc/fstab
+          sync
+          umount /mnt
           # generate all in one updateable update.img
           chmod +x /builder/d3588.git/tools/afptool
           chmod +x /builder/d3588.git/tools/rkImageMaker
