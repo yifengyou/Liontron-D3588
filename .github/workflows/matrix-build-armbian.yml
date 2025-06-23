@@ -203,7 +203,7 @@ jobs:
 
           # show all files
           ls -alh /builder/d3588.git/release/
-          
+
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload D3588 image to Release
@@ -235,9 +235,3 @@ jobs:
             - updateable rockdev img
             ### rootfs.img.squashfs
             - only rootfs.img with squashfs archive
-
-
-
-
-
-
