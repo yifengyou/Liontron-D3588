@@ -1,0 +1,210 @@
+name: kernel 5.10.226 for D3588
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+
+env:
+  TZ: America/New_York
+
+jobs:
+  kdevbuild:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Debian 11 (oldstable, EOL ～2026)
+          - set_release: bullseye
+            set_desktop: mini
+
+          # Debian 12 (stable)
+          - set_release: bookworm
+            set_desktop: mini
+          - set_release: bookworm
+            set_desktop: gnome
+          - set_release: bookworm
+            set_desktop: xfce
+
+          # Debian 13 (testing)
+          - set_release: trixie
+            set_desktop: mini
+          - set_release: trixie
+            set_desktop: gnome
+          - set_release: trixie
+            set_desktop: xfce
+
+          # Debian 14 (unstable, future)
+          - set_release: forky
+            set_desktop: mini
+          - set_release: forky
+            set_desktop: gnome
+          - set_release: forky
+            set_desktop: xfce
+
+          # Ubuntu 20.04 LTS (standard support ended Apr 2025)
+          #          - set_release: focal
+          #            set_desktop: mini
+
+          # Ubuntu 22.04 LTS (supported until 2027)
+          - set_release: jammy
+            set_desktop: mini
+          - set_release: jammy
+            set_desktop: gnome
+          - set_release: jammy
+            set_desktop: xfce
+
+          # Ubuntu 24.04 LTS (current LTS, supported until 2029)
+          - set_release: noble
+            set_desktop: mini
+          - set_release: noble
+            set_desktop: gnome
+          - set_release: noble
+            set_desktop: xfce
+
+          # Ubuntu 24.10 (interim release, EOL Jul 2025)
+          #          - set_release: oracular
+          #            set_desktop: mini
+          #          - set_release: oracular
+          #            set_desktop: gnome
+          #          - set_release: oracular
+          #            set_desktop: xfce
+
+          # Ubuntu 25.04 (planned interim, Apr 2025)
+          - set_release: plucky
+            set_desktop: mini
+          - set_release: plucky
+            set_desktop: gnome
+          - set_release: plucky
+            set_desktop: xfce
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show environment
+        id: basic_info
+        run: |
+          nproc
+          uname -a
+          cat /etc/*release
+          free -h
+          mount
+          df -h
+          cat /proc/cpuinfo
+          cat /proc/meminfo
+
+      - name: Run build in Ubuntu 22.04 container
+        working-directory: ${{ github.workspace }}
+        run: |
+          pwd
+          ls -alh
+          sudo docker run --rm \
+            --privileged \
+            --cap-add SYS_ADMIN \
+            -v /dev:/dev \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e set_release=${{ matrix.set_release }} \
+            -e set_desktop=${{ matrix.set_desktop }} \
+            ubuntu:22.04 \
+            bash -c "
+              chmod +x /workspace/kdevbuild/build-d3588-k5.10.226.sh ;
+              /workspace/kdevbuild/build-d3588-k5.10.226.sh
+            "
+
+      - name: List build output
+        run: |
+          ls -alh  ${{ github.workspace }}/release/*
+          md5sum ${{ github.workspace }}/release/*
+
+      - name: Upload Image to Release
+        uses: ncipollo/release-action@main
+        with:
+          tag: D3588-kernel-5.10.226
+          artifacts: ${{ github.workspace }}/release/*
+          allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ### D3588镜像说明
+
+            1. 镜像命名规则
+            以 **D3588_k5.10.226_${RELEASE}_${DESKTOP}_update.rar** 为例
+
+            - "${RELEASE}" 发行版，可选一下几种发行版
+              - bullseye - Debian 11
+              - bookworm - Debian 12
+              - trixie   - Debian 13
+              - forky    - Debian 14
+              - focal    - Ubuntu 20.04 LTS
+              - jammy    - Ubuntu 22.04 LTS
+              - noble    - Ubuntu 24.04 LTS
+              - oracular - Ubuntu 24.10
+              - plucky   - Ubuntu 25.04
+              - resolute - Ubuntu 25.10
+            - "${DESKTOP}" 桌面环境，可选 (mini,xfce,gnome)
+            - 镜像类型，有两种类型
+              - rockdev: RKDevTool + 分区镜像（uboot.img、boot.img、rootfs.img）
+              - update : RKdevTool + update.img
+
+            2. 系统密码
+
+            - 用户名: root   密码: 1234
+            - 用户名: admin  密码: admin
+            - 用户名: teamhd 密码: teamhd
+            - 用户名: linaro 密码: linaro
+
+            3. rockdev镜像使用指引(文件后缀为rockdev.rar)
+
+            解压后打开RKDevTool.exe，选择'下载镜像'，点击'执行'即可
+
+            ```
+            RKDevTool/
+            ├── bin
+            │         ├── adb.exe
+            │         ├── AdbWinApi.dll
+            │         ├── AdbWinUsbApi.dll
+            │         ├── AFPTool.exe
+            │         └── RKImageMaker.exe
+            ├── config.cfg
+            ├── config.ini
+            ├── Language
+            │         ├── Chinese.ini
+            │         └── English.ini
+            ├── RKDevTool.exe
+            └── rockdev
+                └── image
+                    ├── boot.img
+                    ├── MiniLoaderAll.bin
+                    ├── modules.tar.gz
+                    ├── package-file
+                    ├── parameter.txt
+                    ├── rootfs.img
+                    └── uboot.img
+            ```
+
+            4. update镜像使用指引(文件后缀为update.rar)
+
+            解压后打开RKDevTool.exe，选择'升级固件'，点击'固件'，勾选镜像文件rockdev/img/update.img，点击'升级'即可
+
+            ```
+            RKDevTool/
+            ├── bin
+            │         ├── adb.exe
+            │         ├── AdbWinApi.dll
+            │         ├── AdbWinUsbApi.dll
+            │         ├── AFPTool.exe
+            │         └── RKImageMaker.exe
+            ├── config.cfg
+            ├── config.ini
+            ├── Language
+            │         ├── Chinese.ini
+            │         └── English.ini
+            ├── RKDevTool.exe
+            └── rockdev
+                └── image
+                    └── update.img
+            ```
