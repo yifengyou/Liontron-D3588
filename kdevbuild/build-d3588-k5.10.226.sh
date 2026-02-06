@@ -4,6 +4,8 @@ set -euxo pipefail
 
 WORKDIR=$(pwd)
 export build_tag="D3588_k5.10.226_${set_release}_${set_desktop}"
+export ROOTFS="armbian_${set_release}_${set_desktop}.rar"
+export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/armbian-rootfs/${ROOTFS}"
 export DEBIAN_FRONTEND=noninteractive
 
 #==========================================================================#
@@ -37,6 +39,19 @@ mkdir -p ${WORKDIR}/rockdev
 mkdir -p ${WORKDIR}/release
 
 #==========================================================================#
+# Task: Build Root Filesystem (rootfs) using Armbian Build System          #
+#==========================================================================#
+if [ -z "${set_desktop}" ] || [ -z "${set_release}" ]; then
+  echo "skip rootfs build"
+else
+  mkdir -p ${WORKDIR}/rootfs
+  wget -O ${WORKDIR}/rootfs/${ROOTFS} ${ROOTFS_URL}
+  rar x ${WORKDIR}/rootfs/${ROOTFS}
+  mv ${WORKDIR}/rootfs/rootfs.img ${WORKDIR}/rockdev/rootfs.img
+  ls -alh ${WORKDIR}/rockdev
+fi
+
+#==========================================================================#
 #                        build uboot                                       #
 #==========================================================================#
 cd ${WORKDIR}/
@@ -59,74 +74,6 @@ cd d3588-kernel.git
 cp -a boot.img ${WORKDIR}/rockdev/boot.img
 ls -alh ${WORKDIR}/rockdev/boot.img
 md5sum ${WORKDIR}/rockdev/boot.img
-
-#==========================================================================#
-# Task: Build Root Filesystem (rootfs) using Armbian Build System          #
-#                                                                          #
-# The BRANCH variable selects the kernel version and support level:        #
-#   - edge    : Latest mainline kernel (e.g., 6.10+) — bleeding-edge,      #
-#               may include experimental features or instability.          #
-#   - current : Stable mainline kernel (e.g., 6.6 LTS) — recommended for   #
-#               general use; balances new features and reliability.        #
-#   - legacy  : Vendor-provided kernel (e.g., Rockchip 5.10) — intended    #
-#               for compatibility with proprietary drivers or older BSPs.  #
-#                                                                          #
-# Note: Only the rootfs is needed; kernel, U-Boot, and disk images are     #
-#       not required for this stage.                                       #
-#==========================================================================#
-if [ -z "${set_desktop}" ] || [ -z "${set_release}" ]; then
-  echo "skip rootfs build"
-  echo "Build completed successfully!"
-  exit 0
-fi
-mkdir -p ${WORKDIR}/rootfs
-cd ${WORKDIR}/rootfs
-if [ "${set_desktop}" == "mini" ]; then
-  BUILD_DESKTOP="BUILD_DESKTOP=no"
-else
-  BUILD_DESKTOP=" \
-      BUILD_DESKTOP=yes \
-      DESKTOP_APPGROUPS_SELECTED=remote_desktop \
-      DESKTOP_ENVIRONMENT=${set_desktop} \
-      DESKTOP_ENVIRONMENT_CONFIG_NAME=config_base"
-fi
-git clone -q --single-branch \
-  --depth=1 \
-  --branch=main \
-  https://github.com/armbian/build.git armbian.git
-ls -alh ${WORKDIR}/rootfs/armbian.git
-cd ${WORKDIR}/rootfs/armbian.git
-./compile.sh RELEASE=${set_release} \
-  BOARD=nanopct6 \
-  BRANCH=current \
-  BUILD_MINIMAL=no \
-  BUILD_ONLY=default \
-  HOST=armbian \
-  ${BUILD_DESKTOP} \
-  EXPERT=yes \
-  KERNEL_CONFIGURE=no \
-  COMPRESS_OUTPUTIMAGE="sha,img,xz" \
-  VENDOR="Armbian" \
-  SHARE_LOG=yes
-ls -alh ${WORKDIR}/rootfs/armbian.git/output/images/
-
-# extract rootfs
-chmod +x ${WORKDIR}/tools/extract-rootfs-from-armbian.sh
-${WORKDIR}/tools/extract-rootfs-from-armbian.sh ${WORKDIR}/rootfs/armbian.git/output/images/
-ls -alh ${WORKDIR}/rootfs/armbian.git/output/images/rootfs.img
-md5sum ${WORKDIR}/rootfs/armbian.git/output/images/rootfs.img
-
-# hack rootfs
-mount ${WORKDIR}/rootfs/armbian.git/output/images/rootfs.img /mnt
-cp -a ${WORKDIR}/tools/hack-rootfs.sh /mnt/
-cp -a ${WORKDIR}/tools/armbian_first_run.txt /mnt/boot/
-chmod +x /mnt/hack-rootfs.sh
-chroot /mnt sh -c "/hack-rootfs.sh"
-sync
-umount /mnt
-sync
-mv ${WORKDIR}/rootfs/armbian.git/output/images/rootfs.img ${WORKDIR}/rockdev/rootfs.img
-ls -alh ${WORKDIR}/rockdev
 
 #==========================================================================#
 # Script Name: Generate Rockchip Updatable Image                           #
@@ -163,13 +110,13 @@ chmod +x ${WORKDIR}/rockchip-tools.git/rkImageMaker
 
 mkdir -p ${WORKDIR}/release
 mkdir -p ${WORKDIR}/update_img_tmp
-cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588  \
+cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588 \
   ${WORKDIR}/update_img_tmp/RKDevTool
 mkdir -p ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 
-cp -a ${WORKDIR}/rockdev/uboot.img   ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/boot.img    ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/rootfs.img  ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/uboot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 
 cd ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 ${WORKDIR}/rockchip-tools.git/afptool -pack . temp.img
@@ -216,13 +163,13 @@ sha256sum ${build_tag}_update.rar
 
 mkdir -p ${WORKDIR}/release
 mkdir -p ${WORKDIR}/rockdev_img_tmp
-cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588  \
+cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588 \
   ${WORKDIR}/rockdev_img_tmp/RKDevTool
 mkdir -p ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
 
-cp -a ${WORKDIR}/rockdev/uboot.img   ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/boot.img    ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/rootfs.img  ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/uboot.img ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
+cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
 
 cd ${WORKDIR}/rockdev_img_tmp/
 rar a ${WORKDIR}/release/${build_tag}_rockdev.rar RKDevTool
