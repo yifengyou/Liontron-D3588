@@ -153,17 +153,19 @@ jobs:
             1. 镜像命名规则
             以 **D3588_k5.10.226_${RELEASE}_${DESKTOP}_update.rar** 为例
 
-            - "${RELEASE}" 发行版，可选一下几种发行版
-              - bullseye - Debian 11
-              - bookworm - Debian 12
-              - trixie   - Debian 13
-              - forky    - Debian 14
-              - focal    - Ubuntu 20.04 LTS
-              - jammy    - Ubuntu 22.04 LTS
-              - noble    - Ubuntu 24.04 LTS
-              - oracular - Ubuntu 24.10
-              - plucky   - Ubuntu 25.04
-              - resolute - Ubuntu 25.10
+            ${RELEASE}：操作系统发行版（支持以下选项）
+            Debian 系列
+            bullseye — Debian 11
+            bookworm — Debian 12
+            trixie — Debian 13
+            forky — Debian 14（开发版）
+            Ubuntu 系列
+            focal — Ubuntu 20.04 LTS
+            jammy — Ubuntu 22.04 LTS
+            noble — Ubuntu 24.04 LTS
+            oracular — Ubuntu 24.10
+            plucky — Ubuntu 25.04（开发版）
+            resolute — Ubuntu 25.10（开发版）
             - "${DESKTOP}" 桌面环境，可选 (mini,xfce,gnome)
             - 镜像类型，有两种类型
               - rockdev: RKDevTool + 分区镜像（uboot.img、boot.img、rootfs.img）
