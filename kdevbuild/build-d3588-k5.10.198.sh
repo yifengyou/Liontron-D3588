@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 WORKDIR=$(pwd)
-export build_tag="D3588_k5.10.226_${set_release}_${set_desktop}"
+export build_tag="D3588_k5.10.198_${set_release}_${set_desktop}"
 export ROOTFS="armbian_${set_release}_${set_desktop}.rar"
 export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/armbian-rootfs/${ROOTFS}"
 export DEBIAN_FRONTEND=noninteractive
