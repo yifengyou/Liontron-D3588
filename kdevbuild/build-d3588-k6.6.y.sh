@@ -116,14 +116,20 @@ md5sum arch/arm64/boot/Image
 ls -alh ./arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dtb
 md5sum ./arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dtb
 
-# update rootfs
+# update rootfs with ko
 if [ -d kos/lib/modules ]; then
+  ls -alh kos/lib/modules
+  find kos -name "*.ko"
   mount ${WORKDIR}/rockdev/rootfs.img /mnt
-  rm -rf /mnt/lib/modules/*
-  cp kos/lib/modules/* /mnt/lib/modules
+  rm -rf /mnt/lib/modules/* || :
+  mkdir -p /mnt/lib/modules/
+  cp -a kos/lib/modules/* /mnt/lib/modules
+  sync
   umount /mnt
   sync
 fi
+
+# update rootfs with firmware skip
 
 # generate boot.img
 dd if=/dev/zero of=boot.img bs=1M count=60
@@ -132,13 +138,12 @@ mount boot.img /mnt
 
 mkdir -p /mnt/dtb
 cp -a ./arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dtb /mnt/dtb/
-cp -f ./arch/arm64/boot/Image /mnt/vmlinuz-${KVER}
-cp -f .config /mnt/config-${KVER}
-cp -f ./System.map /mnt/System.map-${KVER}
-touch /mnt/initrd.img-${KVER}
+cp -f ./arch/arm64/boot/Image /mnt/vmlinuz-6.6-kdev
+cp -f .config /mnt/config-6.6-kdev
+cp -f ./System.map /mnt/System.map-6.6-kdev
+touch /mnt/initrd.img-6.6-kdev
 
-mkdir -p /mnt/extlinux/
-cp -f ${WORKDIR}/kernel-6.6.y/extlinux.conf /mnt/extlinux/
+cp -f ${WORKDIR}/kernel-6.6.y/extlinux.conf /mnt/
 cp -f ${WORKDIR}/kernel-6.6.y/armbian_first_run.txt /mnt/
 
 find /mnt
