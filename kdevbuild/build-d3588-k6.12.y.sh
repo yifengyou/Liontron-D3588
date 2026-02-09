@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 WORKDIR=$(pwd)
-export build_tag="D3588_k6.6.y_${set_release}_${set_desktop}"
+export build_tag="D3588_k6.12.y_${set_release}_${set_desktop}"
 export ROOTFS="armbian_${set_release}_${set_desktop}.rar"
 export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/armbian-rootfs/${ROOTFS}"
 export DEBIAN_FRONTEND=noninteractive
@@ -85,20 +85,20 @@ md5sum ${WORKDIR}/rockdev/uboot.img
 #                        build kernel                                      #
 #==========================================================================#
 cd ${WORKDIR}
-git clone https://github.com/ophub/linux-6.6.y.git linux-6.6.y.git
-cd linux-6.6.y.git
+git clone https://github.com/ophub/linux-6.12.y.git linux-6.12.y.git
+cd linux-6.12.y.git
 ls -alh
 
 # apply patch
-if ls "${WORKDIR}/kernel-6.6.y/"*.patch >/dev/null 2>&1; then
+if ls "${WORKDIR}/kernel-6.12.y/"*.patch >/dev/null 2>&1; then
   git config --global user.name yifengyou
   git config --global user.email 842056007@qq.com
-  git am ${WORKDIR}/kernel-6.6.y/*.patch
+  git am ${WORKDIR}/kernel-6.12.y/*.patch
 fi
 
-if [ -d ${WORKDIR}/kernel-6.6.y ]; then
-  ls -alh ${WORKDIR}/kernel-6.6.y/
-  cp -a ${WORKDIR}/kernel-6.6.y/* .
+if [ -d ${WORKDIR}/kernel-6.12.y ]; then
+  ls -alh ${WORKDIR}/kernel-6.12.y/
+  cp -a ${WORKDIR}/kernel-6.12.y/* .
   ls -alh
 fi
 
@@ -138,13 +138,13 @@ mount boot.img /mnt
 
 mkdir -p /mnt/dtb
 cp -a ./arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dtb /mnt/dtb/
-cp -f ./arch/arm64/boot/Image /mnt/vmlinuz-6.6.y-kdev
-cp -f .config /mnt/config-6.6.y-kdev
-cp -f ./System.map /mnt/System.map-6.6.y-kdev
-touch /mnt/initrd.img-6.6.y-kdev
+cp -f ./arch/arm64/boot/Image /mnt/vmlinuz-6.12.y-kdev
+cp -f .config /mnt/config-6.12.y-kdev
+cp -f ./System.map /mnt/System.map-6.12.y-kdev
+touch /mnt/initrd.img-6.12.y-kdev
 
-cp -f ${WORKDIR}/kernel-6.6.y/extlinux.conf /mnt/
-cp -f ${WORKDIR}/kernel-6.6.y/armbian_first_run.txt /mnt/
+cp -f ${WORKDIR}/kernel-6.12.y/extlinux.conf /mnt/
+cp -f ${WORKDIR}/kernel-6.12.y/armbian_first_run.txt /mnt/
 
 find /mnt
 sync
