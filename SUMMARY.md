@@ -11,4 +11,5 @@
 * [maskrom救砖](docs/maskrom救砖.md)
 * [固件拆解](docs/固件拆解.md)
 * [亚克力外壳（支持3个版本）](docs/亚克力外壳.md)
+* [设备树适配](docs/设备树适配.md)
 

@@ -1,4 +1,4 @@
-From a660acc1a14334e4b509d7d05ce104e7856c7f60 Mon Sep 17 00:00:00 2001
+From 8f9d0dccc870bc8648fbc8504b74dbf847bfa02b Mon Sep 17 00:00:00 2001
 From: yifengyou <842056007@qq.com>
 Date: Sun, 8 Feb 2026 01:44:07 +0000
 Subject: [PATCH] add liontron d3588 support
@@ -6,9 +6,9 @@ Subject: [PATCH] add liontron d3588 support
 Signed-off-by: yifengyou <842056007@qq.com>
 ---
  arch/arm64/boot/dts/rockchip/Makefile         |    1 +
- .../dts/rockchip/rk3588-liontron-d3588.dts    |  945 ++
+ .../dts/rockchip/rk3588-liontron-d3588.dts    |  919 ++
  arch/arm64/configs/liontron-d3588_defconfig   | 9635 +++++++++++++++++
- 3 files changed, 10581 insertions(+)
+ 3 files changed, 10555 insertions(+)
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
  create mode 100644 arch/arm64/configs/liontron-d3588_defconfig
 
@@ -25,14 +25,14 @@ index 14fb3ba50..38472096e 100644
  subdir-y	:= $(dts-dirs) overlay
 diff --git a/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
 new file mode 100644
-index 000000000..b991fd8fc
+index 000000000..15f9a1ec8
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
-@@ -0,0 +1,945 @@
+@@ -0,0 +1,919 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
-+ * Copyright (c) 2023 Thomas McKahan
++ * Copyright (c) 2026 yifengyou
 + *
 + */
 +
@@ -44,10 +44,11 @@ index 000000000..b991fd8fc
 +#include "rk3588.dtsi"
 +
 +/ {
-+	model = "FriendlyElec NanoPC-T6";
-+	compatible = "friendlyarm,nanopc-t6", "rockchip,rk3588";
++	model = "Liontron D3588";
++	compatible = "rockchip,rk3588";
 +
 +	aliases {
++		ethernet0 = &gmac1;
 +		mmc0 = &sdhci;
 +		mmc1 = &sdmmc;
 +	};
@@ -56,54 +57,17 @@ index 000000000..b991fd8fc
 +		stdout-path = "serial2:1500000n8";
 +	};
 +
++	// kdev: work ok
 +	leds {
 +		compatible = "gpio-leds";
-+
 +		sys_led: led-0 {
-+			gpios = <&gpio2 RK_PB7 GPIO_ACTIVE_HIGH>;
-+			label = "system-led";
++			label = "sysled";
++			gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
 +			linux,default-trigger = "heartbeat";
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&sys_led_pin>;
-+		};
-+
-+		usr_led: led-1 {
-+			gpios = <&gpio2 RK_PC0 GPIO_ACTIVE_HIGH>;
-+			label = "user-led";
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&usr_led_pin>;
 +		};
 +	};
 +
-+	sound {
-+		compatible = "simple-audio-card";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&hp_det>;
-+
-+		simple-audio-card,name = "realtek,rt5616-codec";
-+		simple-audio-card,format = "i2s";
-+		simple-audio-card,mclk-fs = <256>;
-+
-+		simple-audio-card,hp-det-gpio = <&gpio1 RK_PC4 GPIO_ACTIVE_LOW>;
-+		simple-audio-card,hp-pin-name = "Headphones";
-+
-+		simple-audio-card,widgets =
-+			"Headphone", "Headphones",
-+			"Microphone", "Microphone Jack";
-+		simple-audio-card,routing =
-+			"Headphones", "HPOL",
-+			"Headphones", "HPOR",
-+			"MIC1", "Microphone Jack",
-+			"Microphone Jack", "micbias1";
-+
-+		simple-audio-card,cpu {
-+			sound-dai = <&i2s0_8ch>;
-+		};
-+		simple-audio-card,codec {
-+			sound-dai = <&rt5616>;
-+		};
-+	};
-+
++	// kdev: ok
 +	vcc12v_dcin: vcc12v-dcin-regulator {
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc12v_dcin";
@@ -113,6 +77,7 @@ index 000000000..b991fd8fc
 +		regulator-max-microvolt = <12000000>;
 +	};
 +
++	// kdev: ok
 +	/* vcc5v0_sys powers peripherals */
 +	vcc5v0_sys: vcc5v0-sys-regulator {
 +		compatible = "regulator-fixed";
@@ -135,6 +100,7 @@ index 000000000..b991fd8fc
 +		vin-supply = <&vcc12v_dcin>;
 +	};
 +
++	// kdev: ok
 +	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3-regulator {
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc-1v1-nldo-s3";
@@ -145,16 +111,7 @@ index 000000000..b991fd8fc
 +		vin-supply = <&vcc4v0_sys>;
 +	};
 +
-+	vcc_3v3_pcie20: vcc3v3-pcie20-regulator {
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc_3v3_pcie20";
-+		regulator-always-on;
-+		regulator-boot-on;
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		vin-supply = <&vcc_3v3_s3>;
-+	};
-+
++	// kdev: ok
 +	vbus5v0_typec: vbus5v0-typec-regulator {
 +		compatible = "regulator-fixed";
 +		enable-active-high;
@@ -167,34 +124,11 @@ index 000000000..b991fd8fc
 +		vin-supply = <&vcc5v0_sys>;
 +	};
 +
-+	vcc3v3_pcie2x1l0: vcc3v3-pcie2x1l0-regulator {
-+		compatible = "regulator-fixed";
-+		enable-active-high;
-+		gpio = <&gpio4 RK_PC2 GPIO_ACTIVE_HIGH>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pcie_m2_1_pwren>;
-+		regulator-name = "vcc3v3_pcie2x1l0";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		vin-supply = <&vcc5v0_sys>;
-+	};
-+
-+	vcc3v3_pcie30: vcc3v3-pcie30-regulator {
-+		compatible = "regulator-fixed";
-+		enable-active-high;
-+		gpios = <&gpio2 RK_PC5 GPIO_ACTIVE_HIGH>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pcie_m2_0_pwren>;
-+		regulator-name = "vcc3v3_pcie30";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		vin-supply = <&vcc5v0_sys>;
-+	};
-+
++	// kdev: ok
 +	vcc3v3_sd_s0: vcc3v3-sd-s0-regulator {
 +		compatible = "regulator-fixed";
 +		enable-active-low;
-+		gpio = <&gpio4 RK_PA5 GPIO_ACTIVE_LOW>;
++		gpio = <&gpio1 RK_PA5 GPIO_ACTIVE_LOW>;
 +		regulator-boot-on;
 +		regulator-max-microvolt = <3300000>;
 +		regulator-min-microvolt = <3300000>;
@@ -202,16 +136,15 @@ index 000000000..b991fd8fc
 +		vin-supply = <&vcc_3v3_s3>;
 +	};
 +
-+	vdd_4g_3v3: vdd-4g-3v3-regulator {
-+		compatible = "regulator-fixed";
-+		enable-active-high;
-+		gpio = <&gpio4 RK_PC6 GPIO_ACTIVE_HIGH>;
++	fiq_debugger: fiq-debugger {
++		compatible = "rockchip,fiq-debugger";
++		rockchip,serial = <&uart2>;
++		rockchip,irq-mode-enable = <1>;
++		rockchip,baudrate = <1500000>;
++		interrupts = <GIC_SPI 423 IRQ_TYPE_LEVEL_HIGH>;
 +		pinctrl-names = "default";
-+		pinctrl-0 = <&pin_4g_lte_pwren>;
-+		regulator-name = "vdd_4g_3v3";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		vin-supply = <&vcc5v0_sys>;
++		pinctrl-0 = <&uart2m1_xfer>;
++		status = "okay";
 +	};
 +};
 +
@@ -479,26 +412,14 @@ index 000000000..b991fd8fc
 +};
 +
 +&pcie2x1l0 {
-+	reset-gpios = <&gpio4 RK_PB3 GPIO_ACTIVE_HIGH>;
-+	vpcie3v3-supply = <&vcc_3v3_pcie20>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pcie2_0_rst>;
 +	status = "disabled";
 +};
 +
 +&pcie2x1l1 {
-+	reset-gpios = <&gpio4 RK_PA2 GPIO_ACTIVE_HIGH>;
-+	vpcie3v3-supply = <&vcc3v3_pcie2x1l0>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pcie2_1_rst>;
 +	status = "disabled";
 +};
 +
 +&pcie2x1l2 {
-+	reset-gpios = <&gpio4 RK_PA4 GPIO_ACTIVE_HIGH>;
-+	vpcie3v3-supply = <&vcc_3v3_pcie20>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pcie2_2_rst>;
 +	status = "disabled";
 +};
 +
@@ -507,8 +428,6 @@ index 000000000..b991fd8fc
 +};
 +
 +&pcie3x4 {
-+	reset-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
-+	vpcie3v3-supply = <&vcc3v3_pcie30>;
 +	status = "disabled";
 +};
 +
@@ -570,6 +489,12 @@ index 000000000..b991fd8fc
 +			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 +		};
 +	};
++	rtl8211f {
++			rtl8211f_rst: rtl8211f-rst {
++					rockchip,pins = <3 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
++			};
++	};
++
 +};
 +
 +&pwm1 {
@@ -942,11 +867,6 @@ index 000000000..b991fd8fc
 +	status = "okay";
 +};
 +
-+&u2phy2_host {
-+	phy-supply = <&vdd_4g_3v3>;
-+	status = "okay";
-+};
-+
 +&u2phy3_host {
 +	status = "okay";
 +};
@@ -974,6 +894,61 @@ index 000000000..b991fd8fc
 +&usb_host1_ohci {
 +	status = "okay";
 +};
++
++// kdev: official dts check. ethernet@fe1b0000 disabled
++&gmac0 {
++	status = "disabled";
++};
++
++// kdev: official dts check. ethernet@fe1c0000 okay
++&gmac1 {
++        clock_in_out = "output";
++        phy-handle = <&rgmii_phy>;
++        phy-mode = "rgmii-rxid";
++        pinctrl-0 = <&gmac1_miim
++                     &gmac1_tx_bus2
++                     &gmac1_rx_bus2
++                     &gmac1_rgmii_clk
++                     &gmac1_rgmii_bus>;
++        pinctrl-names = "default";
++        rx_delay = <0x00>;
++        tx_delay = <0x43>;
++        status = "okay";
++};
++
++&mdio1 {
++	rgmii_phy: ethernet-phy@1 {
++			/* RTL8211F */
++			compatible = "ethernet-phy-id001c.c916",
++						 "ethernet-phy-ieee802.3-c22";
++			reg = <0x1>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&rtl8211f_rst>;
++			reset-assert-us = <15000>;
++			reset-deassert-us = <50000>;
++			reset-gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
++	};
++};
++
++
++&gmac1_stmmac_axi_setup {
++    snps,blen = <0 0 0 0 16 8 4>;
++    snps,wr_osr_lmt = <4>;
++    snps,rd_osr_lmt = <8>;
++};
++
++&gmac1_mtl_rx_setup {
++    snps,rx-queues-to-use = <2>;
++    queue0 {};
++    queue1 {};
++};
++
++&gmac1_mtl_tx_setup {
++    snps,tx-queues-to-use = <2>;
++    queue0 {};
++    queue1 {};
++};
+\ No newline at end of file
 diff --git a/arch/arm64/configs/liontron-d3588_defconfig b/arch/arm64/configs/liontron-d3588_defconfig
 new file mode 100644
 index 000000000..dc0443067

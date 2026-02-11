@@ -4,8 +4,10 @@ set -euxo pipefail
 
 WORKDIR=$(pwd)
 export build_tag="D3588_k6.6.y_${set_release}_${set_desktop}"
-export ROOTFS="armbian_${set_release}_${set_desktop}.rar"
+
+export ROOTFS="${set_vendor}_${set_release}_${set_desktop}.rar"
 export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/armbian-rootfs/${ROOTFS}"
+
 export DEBIAN_FRONTEND=noninteractive
 
 #==========================================================================#
@@ -41,7 +43,7 @@ mkdir -p ${WORKDIR}/release
 #==========================================================================#
 # Task: Build Root Filesystem (rootfs) using Armbian Build System          #
 #==========================================================================#
-if [ -z "${set_desktop}" ] || [ -z "${set_release}" ]; then
+if [ -z "${set_vendor}" ] || -z "${set_desktop}" ] || [ -z "${set_release}" ]; then
   echo "skip rootfs build"
 else
   mkdir -p ${WORKDIR}/rootfs
