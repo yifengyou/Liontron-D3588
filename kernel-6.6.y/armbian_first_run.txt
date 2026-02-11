@@ -1,4 +1,0 @@
-root_password=admin
-username=admin
-user_password=admin
-shell=bash
