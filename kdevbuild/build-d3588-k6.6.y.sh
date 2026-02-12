@@ -4,6 +4,7 @@ set -euxo pipefail
 
 WORKDIR=$(pwd)
 export DEBIAN_FRONTEND=noninteractive
+export BUILD_TAG="D3588_k6.6.y_${set_vendor}_${set_rootfs}"
 
 #==========================================================================#
 #                        init build env                                    #
@@ -42,56 +43,37 @@ mkdir -p /dev
 mkdir -p ${WORKDIR}/rootfs
 cd ${WORKDIR}/rootfs/
 
-if [ -z "${set_vendor}" ]; then
+if [ -z "${set_vendor}" ] || [ -z "${set_rootfs}" ]; then
   echo "skip rootfs build"
 else
-  if [ "$set_vendor" == "armbian" ]; then
-    if [ -z "${set_desktop}" ] || [ -z "${set_release}" ]; then
-      echo "armbian desktop and release not specified"
-      exit 1
-    fi
-    export ROOTFS="${set_vendor}_${set_release}_${set_desktop}.rar"
-    export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/armbian-rootfs/${ROOTFS}"
-    export build_tag="D3588_k6.6.y_${set_vendor}_${set_release}_${set_desktop}"
-
-    aria2c --check-certificate=false \
-      --max-connection-per-server=16 \
-      --split=16 \
-      --human-readable=true \
-      --summary-interval=5 \
-      -o ${ROOTFS} \
-      "${ROOTFS_URL}"
-
-    ls -alh
-    rar x ${ROOTFS}
-    ls -alh
-    mv rootfs.img ${WORKDIR}/rockdev/rootfs.img
-    ls -alh ${WORKDIR}/rockdev
-  elif [ "$set_vendor" == "fnos" ]; then
-    if [ -z "${set_version}" ]; then
-      echo "fnos version not specified"
-      exit 1
-    fi
-    export ROOTFS="${set_vendor}_${set_version}.rar"
-    export ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/fnos-rootfs/${ROOTFS}"
-    export build_tag="D3588_k6.6.y_${set_vendor}_${set_version}"
-
-    aria2c --check-certificate=false \
-      --max-connection-per-server=16 \
-      --split=16 \
-      --human-readable=true \
-      --summary-interval=5 \
-      -o ${ROOTFS} \
-      "${ROOTFS_URL}"
-
-    ls -alh
-    rar x ${ROOTFS}
-    ls -alh
-    mv rootfs.img ${WORKDIR}/rockdev/rootfs.img
-    ls -alh ${WORKDIR}/rockdev
-  else
-    export build_tag="D3588_k6.6.y_${set_vendor}"
+  ROOTFS=$(
+    curl -s "https://api.github.com/repos/yifengyou/kdev/releases/tags/${set_vendor}-rootfs" |
+      jq -r '.assets[].name' |
+      grep -i "${set_rootfs}" |
+      grep -E 'aarch64|arm64' |
+      head -n1
+  )
+  if [ -z "${ROOTFS}" ]; then
+    echo "no rootfs found!"
+    exit 1
   fi
+  echo "ROOTFS:${ROOTFS}"
+  ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/${set_vendor}-rootfs/${ROOTFS}"
+  echo "ROOTFS_URL:${ROOTFS_URL}"
+
+  aria2c --check-certificate=false \
+    --max-connection-per-server=16 \
+    --split=16 \
+    --human-readable=true \
+    --summary-interval=5 \
+    -o ${ROOTFS} \
+    "${ROOTFS_URL}"
+
+  ls -alh
+  rar x ${ROOTFS}
+  ls -alh
+  mv rootfs.img ${WORKDIR}/rockdev/rootfs.img
+  ls -alh ${WORKDIR}/rockdev
 fi
 
 ls -alh ${WORKDIR}/rockdev/rootfs.img
@@ -215,7 +197,7 @@ label l0r
 
 EOF
 
-cat /mnt/armbian_first_run.txt << EOF
+cat > /mnt/armbian_first_run.txt <<EOF
 root_password=admin
 username=admin
 user_password=admin

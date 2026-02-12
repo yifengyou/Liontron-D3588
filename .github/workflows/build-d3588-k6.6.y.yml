@@ -15,92 +15,171 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Debian 11 (oldstable, EOL ～2026)
+          # armbian debian 11 (oldstable, EOL ～2026)
           - set_vendor: armbian
-            set_release: bullseye
-            set_desktop: mini
-
-          # Debian 12 (stable)
+            set_rootfs: bullseye_mini
+          # armbian debian 12 (stable)
           - set_vendor: armbian
-            set_release: bookworm
-            set_desktop: mini
-
+            set_rootfs: bookworm_mini
           - set_vendor: armbian
-            set_release: bookworm
-            set_desktop: gnome
-
+            set_rootfs: bookworm_gnome
           - set_vendor: armbian
-            set_release: bookworm
-            set_desktop: xfce
-
-          # Debian 13 (testing)
+            set_rootfs: bookworm_xfce
+          # armbian debian 13 (testing)
           - set_vendor: armbian
-            set_release: trixie
-            set_desktop: mini
-
+            set_rootfs: trixie_mini
           - set_vendor: armbian
-            set_release: trixie
-            set_desktop: gnome
-
+            set_rootfs: trixie_gnome
           - set_vendor: armbian
-            set_release: trixie
-            set_desktop: xfce
-
-          # Debian 14 (unstable, future)
+            set_rootfs: trixie_xfce
+          # armbian debian 14 (unstable, future)
           - set_vendor: armbian
-            set_release: forky
-            set_desktop: mini
-
+            set_rootfs: forky_mini
           - set_vendor: armbian
-            set_release: forky
-            set_desktop: gnome
-
+            set_rootfs: forky_gnome
           - set_vendor: armbian
-            set_release: forky
-            set_desktop: xfce
-
-          # Ubuntu 22.04 LTS (supported until 2027)
+            set_rootfs: forky_xfce
+          # armbian ubuntu 22.04 LTS (supported until 2027)
           - set_vendor: armbian
-            set_release: jammy
-            set_desktop: mini
-
+            set_rootfs: jammy_mini
           - set_vendor: armbian
-            set_release: jammy
-            set_desktop: gnome
-
+            set_rootfs: jammy_gnome
           - set_vendor: armbian
-            set_release: jammy
-            set_desktop: xfce
-
-          # Ubuntu 24.04 LTS (current LTS, supported until 2029)
+            set_rootfs: jammy_xfce
+          # armbian ubuntu 24.04 LTS (current LTS, supported until 2029)
           - set_vendor: armbian
-            set_release: noble
-            set_desktop: mini
-
+            set_rootfs: noble_mini
           - set_vendor: armbian
-            set_release: noble
-            set_desktop: gnome
-
+            set_rootfs: noble_gnome
           - set_vendor: armbian
-            set_release: noble
-            set_desktop: xfce
-
-          # Ubuntu 25.04 (planned interim, Apr 2025)
+            set_rootfs: noble_xfce
+          # armbian ubuntu 25.04 (planned interim, Apr 2025)
           - set_vendor: armbian
-            set_release: plucky
-            set_desktop: mini
-
+            set_rootfs: plucky_mini
           - set_vendor: armbian
-            set_release: plucky
-            set_desktop: gnome
-
+            set_rootfs: plucky_gnome
           - set_vendor: armbian
-            set_release: plucky
-            set_desktop: xfce
-
-          # fnos 2026/02/10 v1.1.19
+            set_rootfs: plucky_xfce
+          # fnos
           - set_vendor: fnos
             set_version: 1.1.19
+          # centos
+          - set_vendor: centos
+            set_rootfs: 10
+          - set_vendor: centos
+            set_rootfs: 9
+          - set_vendor: centos
+            set_rootfs: 8
+          # rockylinux
+          - set_vendor: rockylinux
+            set_rootfs: 10
+          - set_vendor: rockylinux
+            set_rootfs: 9
+          - set_vendor: rockylinux
+            set_rootfs: 8
+          # ubuntu
+          - set_vendor: ubuntu
+            set_rootfs: bionic_18.04
+          - set_vendor: ubuntu
+            set_rootfs: focal_20.04
+          - set_vendor: ubuntu
+            set_rootfs: jammy_22.04
+          - set_vendor: ubuntu
+            set_rootfs: noble_24.04
+          # debian
+          - set_vendor: debian
+            set_rootfs: bookworm_12
+          - set_vendor: debian
+            set_rootfs: buulseye_11
+          - set_vendor: debian
+            set_rootfs: trixie_13
+          # fedora
+          - set_vendor: fedora
+            set_rootfs: 43-1.6
+          - set_vendor: fedora
+            set_rootfs: 42-1.1
+          - set_vendor: fedora
+            set_rootfs: generic-41-1.4
+          - set_vendor: fedora
+            set_rootfs: 39-1.5
+          - set_vendor: fedora
+            set_rootfs: 38-1.6
+          - set_vendor: fedora
+            set_rootfs: 37-1.7
+          - set_vendor: fedora
+            set_rootfs: 36-1.5
+          - set_vendor: fedora
+            set_rootfs: 35-1.2
+          - set_vendor: fedora
+            set_rootfs: 34-1.2
+          - set_vendor: fedora
+            set_rootfs: 33-1.2
+          # kali
+          - set_vendor: kali
+            set_rootfs: 2025.3
+          - set_vendor: kali
+            set_rootfs: 2025.4
+          # opencloudos
+          - set_vendor: opencloudos
+            set_rootfs: genericcloud-9.4
+          - set_vendor: opencloudos
+            set_rootfs: genericcloud-9.2
+          - set_vendor: opencloudos
+            set_rootfs: 8.8
+          - set_vendor: opencloudos
+            set_rootfs: genericcloud-8.10
+          - set_vendor: opencloudos
+            set_rootfs: 8.6-minimal
+          # openeuler
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP1
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP2
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP3
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP4
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP1
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP2
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP3
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP4
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP1
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP2
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP3
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.03-LTS
+          # openanolis
+          - set_vendor: openanolis
+            set_rootfs: 8.2
+          - set_vendor: openanolis
+            set_rootfs: 8.4
+          - set_vendor: openanolis
+            set_rootfs: 8.6
+          - set_vendor: openanolis
+            set_rootfs: 8.6
+          - set_vendor: openanolis
+            set_rootfs: 8.10
+          - set_vendor: openanolis
+            set_rootfs: 23.0
+          - set_vendor: openanolis
+            set_rootfs: 23.1
+          - set_vendor: openanolis
+            set_rootfs: 23.2
+          - set_vendor: openanolis
+            set_rootfs: 23.3
+          - set_vendor: openanolis
+            set_rootfs: 23.4
 
     steps:
       - name: Checkout
@@ -149,9 +228,7 @@ jobs:
             -v /builder:/workspace \
             -w /workspace \
             -e set_vendor=${{ matrix.set_vendor }} \
-            -e set_release=${{ matrix.set_release }} \
-            -e set_desktop=${{ matrix.set_desktop }} \
-            -e set_version=${{ matrix.set_version }} \
+            -e set_rootfs=${{ matrix.set_rootfs }} \
             ubuntu:22.04 \
             bash -c "
               chmod +x /workspace/kdevbuild/build-d3588-k6.6.y.sh ;
