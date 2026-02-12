@@ -1,4 +1,4 @@
-name: kernel 6.6.y for D3588
+name: Build D3588 Image  (6.6.y)
 
 on:
   repository_dispatch:
@@ -90,7 +90,7 @@ jobs:
           - set_vendor: debian
             set_rootfs: bookworm_12
           - set_vendor: debian
-            set_rootfs: buulseye_11
+            set_rootfs: bullseye_11
           - set_vendor: debian
             set_rootfs: trixie_13
           # fedora
@@ -231,8 +231,8 @@ jobs:
             -e set_rootfs=${{ matrix.set_rootfs }} \
             ubuntu:22.04 \
             bash -c "
-              chmod +x /workspace/kdevbuild/build-d3588-k6.6.y.sh ;
-              /workspace/kdevbuild/build-d3588-k6.6.y.sh
+              chmod +x /workspace/kdevbuild/build-d3588-image-k6.6.y.sh ;
+              /workspace/kdevbuild/build-d3588-image-k6.6.y.sh
             "
 
       - name: List build output
