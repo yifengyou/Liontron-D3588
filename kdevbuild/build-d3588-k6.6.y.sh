@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -uxo pipefail
 
 WORKDIR=$(pwd)
 export DEBIAN_FRONTEND=noninteractive

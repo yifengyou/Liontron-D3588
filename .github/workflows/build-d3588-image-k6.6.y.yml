@@ -62,7 +62,7 @@ jobs:
             set_rootfs: plucky_xfce
           # fnos
           - set_vendor: fnos
-            set_version: 1.1.19
+            set_rootfs: 1.1.19
           # centos
           - set_vendor: centos
             set_rootfs: 10

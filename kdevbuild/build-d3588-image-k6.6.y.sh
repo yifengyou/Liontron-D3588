@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -uxo pipefail
 
 WORKDIR=$(pwd)
 export DEBIAN_FRONTEND=noninteractive
@@ -47,7 +47,11 @@ if [ -z "${set_vendor}" ] || [ -z "${set_rootfs}" ]; then
   echo "skip rootfs build"
 else
   ROOTFS=$(
-    curl -s "https://api.github.com/repos/yifengyou/kdev/releases/tags/${set_vendor}-rootfs" |
+    curl \
+      --retry 5 \
+      --retry-delay 10 \
+      --retry-all-errors \
+      -s "https://api.github.com/repos/yifengyou/kdev/releases/tags/${set_vendor}-rootfs" |
       jq -r '.assets[].name' |
       grep -i "${set_rootfs}" |
       grep -E 'aarch64|arm64' |
@@ -153,7 +157,7 @@ cp -f Image /mnt/vmlinuz-6.6.y-kdev
 # cp -f ./System.map /mnt/System.map-6.6.y-kdev
 touch /mnt/initrd.img-6.6.y-kdev
 
-cat > /mnt/extlinux.conf <<EOF
+cat >/mnt/extlinux.conf <<EOF
 ## /extlinux/extlinux.conf
 ##
 ## IMPORTANT WARNING
@@ -183,7 +187,7 @@ label l0r
 
 EOF
 
-cat > /mnt/armbian_first_run.txt <<EOF
+cat >/mnt/armbian_first_run.txt <<EOF
 root_password=admin
 username=admin
 user_password=admin

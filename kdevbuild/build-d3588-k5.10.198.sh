@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -uxo pipefail
 
 WORKDIR=$(pwd)
 export build_tag="D3588_k5.10.198_${set_release}_${set_desktop}"
