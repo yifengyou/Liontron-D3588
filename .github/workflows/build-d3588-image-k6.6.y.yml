@@ -7,6 +7,8 @@ on:
 
 env:
   TZ: America/New_York
+  ACTIONS_STEP_DEBUG: true
+  ACTIONS_RUNNER_DEBUG: true
 
 jobs:
   kdevbuild:
@@ -158,7 +160,9 @@ jobs:
           - set_vendor: openeuler
             set_rootfs: openEuler-24.03-LTS-SP3
           - set_vendor: openeuler
-            set_rootfs: openEuler-25.03-LTS
+            set_rootfs: openEuler-25.03
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.09
           # openanolis
           - set_vendor: openanolis
             set_rootfs: 8.2
