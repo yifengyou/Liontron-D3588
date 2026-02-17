@@ -4,14 +4,14 @@ set -uxo pipefail
 
 WORKDIR=$(pwd)
 export DEBIAN_FRONTEND=noninteractive
-export BUILD_TAG="D3588_k6.6.y_${set_vendor}_${set_rootfs}"
+export BUILD_TAG="D3588_k6.6.y_${set_rootfs}"
 
 #==========================================================================#
 #                        init build env                                    #
 #==========================================================================#
 apt-get update
-apt-get install -y ca-certificates
-apt-get install -y --no-install-recommends \
+apt-get install -qq -y ca-certificates
+apt-get install -qq -y --no-install-recommends \
   acl aptly aria2 axel bc binfmt-support binutils-aarch64-linux-gnu bison \
   bsdextrautils btrfs-progs build-essential busybox ca-certificates ccache \
   clang coreutils cpio crossbuild-essential-arm64 cryptsetup curl \
@@ -46,23 +46,8 @@ cd ${WORKDIR}/rootfs/
 if [ -z "${set_vendor}" ] || [ -z "${set_rootfs}" ]; then
   echo "skip rootfs build"
 else
-  ROOTFS=$(
-    curl \
-      --retry 5 \
-      --retry-delay 10 \
-      --retry-all-errors \
-      -s "https://api.github.com/repos/yifengyou/kdev/releases/tags/${set_vendor}-rootfs" |
-      jq -r '.assets[].name' |
-      grep -i "${set_rootfs}" |
-      grep -E 'aarch64|arm64' |
-      head -n1
-  )
-  if [ -z "${ROOTFS}" ]; then
-    echo "no rootfs found!"
-    exit 1
-  fi
-  echo "ROOTFS:${ROOTFS}"
-  ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/${set_vendor}-rootfs/${ROOTFS}"
+  echo "ROOTFS:${set_rootfs}"
+  ROOTFS_URL="https://github.com/yifengyou/kdev/releases/download/${set_vendor}-rootfs/${set_rootfs}"
   echo "ROOTFS_URL:${ROOTFS_URL}"
 
   aria2c --check-certificate=false \
@@ -70,11 +55,11 @@ else
     --split=16 \
     --human-readable=true \
     --summary-interval=5 \
-    -o ${ROOTFS} \
+    -o ${set_rootfs} \
     "${ROOTFS_URL}"
 
   ls -alh
-  rar x ${ROOTFS}
+  rar x ${set_rootfs}
   ls -alh
   mv rootfs.img ${WORKDIR}/rockdev/rootfs.img
   ls -alh ${WORKDIR}/rockdev

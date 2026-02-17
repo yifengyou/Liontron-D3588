@@ -10,8 +10,8 @@ export BUILD_TAG="D3588_k6.6.y_${set_vendor}_${set_rootfs}"
 #                        init build env                                    #
 #==========================================================================#
 apt-get update
-apt-get install -y ca-certificates
-apt-get install -y --no-install-recommends \
+apt-get install -qq -y ca-certificates
+apt-get install -qq -y --no-install-recommends \
   acl aptly aria2 axel bc binfmt-support binutils-aarch64-linux-gnu bison \
   bsdextrautils btrfs-progs build-essential busybox ca-certificates ccache \
   clang coreutils cpio crossbuild-essential-arm64 cryptsetup curl \
@@ -259,6 +259,8 @@ mkdir -p ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 cp -a ${WORKDIR}/rockdev/uboot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+ls -alh ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+file ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/*
 
 cd ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
 ${WORKDIR}/rockchip-tools.git/afptool -pack . temp.img

@@ -9,8 +9,8 @@ export DEBIAN_FRONTEND=noninteractive
 #                        init build env                                    #
 #==========================================================================#
 apt-get update
-apt-get install -y ca-certificates
-apt-get install -y --no-install-recommends \
+apt-get install -qq -y ca-certificates
+apt-get install -qq -y --no-install-recommends \
   acl aptly aria2 axel bc binfmt-support binutils-aarch64-linux-gnu bison \
   bsdextrautils btrfs-progs build-essential busybox ca-certificates ccache \
   clang coreutils cpio crossbuild-essential-arm64 cryptsetup curl \

@@ -17,173 +17,425 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # armbian debian 11 (oldstable, EOL ～2026)
-          - set_vendor: armbian
-            set_rootfs: bullseye_mini
-          # armbian debian 12 (stable)
-          - set_vendor: armbian
-            set_rootfs: bookworm_mini
-          - set_vendor: armbian
-            set_rootfs: bookworm_gnome
-          - set_vendor: armbian
-            set_rootfs: bookworm_xfce
-          # armbian debian 13 (testing)
-          - set_vendor: armbian
-            set_rootfs: trixie_mini
-          - set_vendor: armbian
-            set_rootfs: trixie_gnome
-          - set_vendor: armbian
-            set_rootfs: trixie_xfce
-          # armbian debian 14 (unstable, future)
-          - set_vendor: armbian
-            set_rootfs: forky_mini
-          - set_vendor: armbian
-            set_rootfs: forky_gnome
-          - set_vendor: armbian
-            set_rootfs: forky_xfce
-          # armbian ubuntu 22.04 LTS (supported until 2027)
-          - set_vendor: armbian
-            set_rootfs: jammy_mini
-          - set_vendor: armbian
-            set_rootfs: jammy_gnome
-          - set_vendor: armbian
-            set_rootfs: jammy_xfce
-          # armbian ubuntu 24.04 LTS (current LTS, supported until 2029)
-          - set_vendor: armbian
-            set_rootfs: noble_mini
-          - set_vendor: armbian
-            set_rootfs: noble_gnome
-          - set_vendor: armbian
-            set_rootfs: noble_xfce
-          # armbian ubuntu 25.04 (planned interim, Apr 2025)
-          - set_vendor: armbian
-            set_rootfs: plucky_mini
-          - set_vendor: armbian
-            set_rootfs: plucky_gnome
-          - set_vendor: armbian
-            set_rootfs: plucky_xfce
-          # fnos
+          - set_vendor: istoreos
+            set_rootfs: istoreos_24.10.1_arm64.rar
+          - set_vendor: istoreos
+            set_rootfs: istoreos_24.10.2_arm64.rar
+          - set_vendor: istoreos
+            set_rootfs: istoreos_24.10.3_arm64.rar
+          - set_vendor: istoreos
+            set_rootfs: istoreos_24.10.4_arm64.rar
+          - set_vendor: istoreos
+            set_rootfs: istoreos_24.10.5_arm64.rar
+          - set_vendor: openwrt
+            set_rootfs: openwrt_24.10.1_aarch64.rar
+          - set_vendor: openwrt
+            set_rootfs: openwrt_24.10.2_aarch64.rar
+          - set_vendor: openwrt
+            set_rootfs: openwrt_24.10.3_aarch64.rar
+          - set_vendor: openwrt
+            set_rootfs: openwrt_24.10.4_aarch64.rar
+          - set_vendor: openwrt
+            set_rootfs: openwrt_24.10.5_aarch64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_bionic_18.04_amd64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_bionic_18.04_arm64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_focal_20.04_amd64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_focal_20.04_arm64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_jammy_22.04_amd64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_jammy_22.04_arm64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_noble_24.04_amd64.rar
+          - set_vendor: ubuntu
+            set_rootfs: ubuntu_noble_24.04_arm64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP1.aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP1.x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP2-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP2-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP3-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP3-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP4-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS-SP4-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS.aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.03-LTS.x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.09.aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-20.09.x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-21.03-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-21.03-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-21.09-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-21.09-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-64kb-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP1-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP1-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP2-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP2-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP3-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP3-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP4-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-SP4-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.03-LTS-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.09-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-22.09-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-23.03-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-23.03-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-23.09-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-23.09-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP1-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP1-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP2-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP2-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP3-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-SP3-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.03-LTS-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.09-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-24.09-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.03-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.03-x86_64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.09-aarch64.rar
+          - set_vendor: openeuler
+            set_rootfs: openEuler-25.09-x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-8.8-5.4.119-20.0009.29-20230817.1028-aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-8.8-5.4.119-20.0009.29-20230817.1028-x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-EC2-9.2-20250226.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-EC2-9.2-20250226.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-8.10-20240729.0-20240730.1137-x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-8.10-20240729.0-20240730.1138-aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240529.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240529.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240711.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240711.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240807.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240807.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240919.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20240919.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20241030.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20241030.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20241211.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20241211.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250226.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250226.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250327.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250327.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250421.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.2-20250421.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20250820.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20250820.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20251120.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20251120.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20251223.0.aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: OpenCloudOS-GenericCloud-9.4-20251223.0.x86_64.rar
+          - set_vendor: opencloudos
+            set_rootfs: opencloudos-v8.6-minimal-aarch64-20230206.rar
+          - set_vendor: opencloudos
+            set_rootfs: opencloudos-v8.6-minimal-x86_64-20230206.rar
+          - set_vendor: opencloudos
+            set_rootfs: opencloudos-v9.0-20230317-aarch64.rar
+          - set_vendor: opencloudos
+            set_rootfs: opencloudos-v9.0-20230329-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.0-aarch64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.0-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.1-aarch64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.1-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.2-aarch64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.2-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.3-aarch64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.3-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.4-aarch64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-23.4-x86_64.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-7.9-GA-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-7.9-GA-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-7.9-GA-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-7.9-GA-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.10-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.10-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.10-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.10-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.2-GA-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.2-GA-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.2-GA-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.2-GA-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.4-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.4-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.4-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.4-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.6-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.6-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.6-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.6-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.8-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.8-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.8-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.8-x86_64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.9-aarch64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.9-aarch64-RHCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.9-x86_64-ANCK.rar
+          - set_vendor: openanolis
+            set_rootfs: AnolisOS-8.9-x86_64-RHCK.rar
+          - set_vendor: kali
+            set_rootfs: kali-linux-2025.3-cloud-genericcloud-amd64.rar
+          - set_vendor: kali
+            set_rootfs: kali-linux-2025.3-cloud-genericcloud-arm64.rar
+          - set_vendor: kali
+            set_rootfs: kali-linux-2025.4-cloud-genericcloud-amd64.rar
+          - set_vendor: kali
+            set_rootfs: kali-linux-2025.4-cloud-genericcloud-arm64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-33-1.2.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-33-1.2.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-34-1.2.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-34-1.2.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-35-1.2.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-35-1.2.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-36-1.5.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-36-1.5.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-37-1.7.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-37-1.7.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-38-1.6.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-38-1.6.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-39-1.5.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-39-1.5.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-Generic-41-1.4.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-Generic-41-1.4.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-Generic.aarch64-40-1.14.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-Generic.x86_64-40-1.14.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-UEFI-UKI-41-1.4.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-UEFI-UKI-41-1.4.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-UEFI-UKI.aarch64-40-1.14.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Cloud-Base-UEFI-UKI.x86_64-40-1.14.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Server-Guest-Generic-42-1.1.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Server-Guest-Generic-42-1.1.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Server-Guest-Generic-43-1.6.aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: Fedora-Server-Guest-Generic-43-1.6.x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: fedora_42_aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: fedora_42_x86_64.rar
+          - set_vendor: fedora
+            set_rootfs: fedora_43_aarch64.rar
+          - set_vendor: fedora
+            set_rootfs: fedora_43_x86_64.rar
+          - set_vendor: debian
+            set_rootfs: debian_bookworm_12_amd64.rar
+          - set_vendor: debian
+            set_rootfs: debian_bookworm_12_arm64.rar
+          - set_vendor: debian
+            set_rootfs: debian_bullseye_11_amd64.rar
+          - set_vendor: debian
+            set_rootfs: debian_bullseye_11_arm64.rar
+          - set_vendor: debian
+            set_rootfs: debian_trixie_13_amd64.rar
+          - set_vendor: debian
+            set_rootfs: debian_trixie_13_arm64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_10_aarch64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_10_x86_64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_8_aarch64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_8_x86_64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_9_aarch64.rar
+          - set_vendor: rockylinux
+            set_rootfs: rockylinux_9_x86_64.rar
           - set_vendor: fnos
-            set_rootfs: 1.1.19
-          # centos
+            set_rootfs: fnos_1.1.19_arm64.rar
           - set_vendor: centos
-            set_rootfs: 10
+            set_rootfs: centos_10_aarch64.rar
           - set_vendor: centos
-            set_rootfs: 9
+            set_rootfs: centos_10_x86_64.rar
           - set_vendor: centos
-            set_rootfs: 8
-          # rockylinux
-          - set_vendor: rockylinux
-            set_rootfs: 10
-          - set_vendor: rockylinux
-            set_rootfs: 9
-          - set_vendor: rockylinux
-            set_rootfs: 8
-          # ubuntu
-          - set_vendor: ubuntu
-            set_rootfs: bionic_18.04
-          - set_vendor: ubuntu
-            set_rootfs: focal_20.04
-          - set_vendor: ubuntu
-            set_rootfs: jammy_22.04
-          - set_vendor: ubuntu
-            set_rootfs: noble_24.04
-          # debian
-          - set_vendor: debian
-            set_rootfs: bookworm_12
-          - set_vendor: debian
-            set_rootfs: bullseye_11
-          - set_vendor: debian
-            set_rootfs: trixie_13
-          # fedora
-          - set_vendor: fedora
-            set_rootfs: 43-1.6
-          - set_vendor: fedora
-            set_rootfs: 42-1.1
-          - set_vendor: fedora
-            set_rootfs: generic-41-1.4
-          - set_vendor: fedora
-            set_rootfs: 39-1.5
-          - set_vendor: fedora
-            set_rootfs: 38-1.6
-          - set_vendor: fedora
-            set_rootfs: 37-1.7
-          - set_vendor: fedora
-            set_rootfs: 36-1.5
-          - set_vendor: fedora
-            set_rootfs: 35-1.2
-          - set_vendor: fedora
-            set_rootfs: 34-1.2
-          - set_vendor: fedora
-            set_rootfs: 33-1.2
-          # kali
-          - set_vendor: kali
-            set_rootfs: 2025.3
-          - set_vendor: kali
-            set_rootfs: 2025.4
-          # opencloudos
-          - set_vendor: opencloudos
-            set_rootfs: genericcloud-9.4
-          - set_vendor: opencloudos
-            set_rootfs: genericcloud-9.2
-          - set_vendor: opencloudos
-            set_rootfs: 8.8
-          - set_vendor: opencloudos
-            set_rootfs: genericcloud-8.10
-          - set_vendor: opencloudos
-            set_rootfs: 8.6-minimal
-          # openeuler
-          - set_vendor: openeuler
-            set_rootfs: openEuler-20.03-LTS-SP1
-          - set_vendor: openeuler
-            set_rootfs: openEuler-20.03-LTS-SP2
-          - set_vendor: openeuler
-            set_rootfs: openEuler-20.03-LTS-SP3
-          - set_vendor: openeuler
-            set_rootfs: openEuler-20.03-LTS-SP4
-          - set_vendor: openeuler
-            set_rootfs: openEuler-22.03-LTS
-          - set_vendor: openeuler
-            set_rootfs: openEuler-22.03-LTS-SP1
-          - set_vendor: openeuler
-            set_rootfs: openEuler-22.03-LTS-SP2
-          - set_vendor: openeuler
-            set_rootfs: openEuler-22.03-LTS-SP3
-          - set_vendor: openeuler
-            set_rootfs: openEuler-22.03-LTS-SP4
-          - set_vendor: openeuler
-            set_rootfs: openEuler-24.03-LTS
-          - set_vendor: openeuler
-            set_rootfs: openEuler-24.03-LTS-SP1
-          - set_vendor: openeuler
-            set_rootfs: openEuler-24.03-LTS-SP2
-          - set_vendor: openeuler
-            set_rootfs: openEuler-24.03-LTS-SP3
-          - set_vendor: openeuler
-            set_rootfs: openEuler-25.03
-          - set_vendor: openeuler
-            set_rootfs: openEuler-25.09
-          # openanolis
-          - set_vendor: openanolis
-            set_rootfs: 8.2
-          - set_vendor: openanolis
-            set_rootfs: 8.4
-          - set_vendor: openanolis
-            set_rootfs: 8.6
-          - set_vendor: openanolis
-            set_rootfs: 8.6
-          - set_vendor: openanolis
-            set_rootfs: 8.10
-          - set_vendor: openanolis
-            set_rootfs: 23.0
-          - set_vendor: openanolis
-            set_rootfs: 23.1
-          - set_vendor: openanolis
-            set_rootfs: 23.2
-          - set_vendor: openanolis
-            set_rootfs: 23.3
-          - set_vendor: openanolis
-            set_rootfs: 23.4
+            set_rootfs: centos_8_aarch64.rar
+          - set_vendor: centos
+            set_rootfs: centos_8_x86_64.rar
+          - set_vendor: centos
+            set_rootfs: centos_9_aarch64.rar
+          - set_vendor: centos
+            set_rootfs: centos_9_x86_64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_bookworm_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_bookworm_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_bookworm_xfce_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_bullseye_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_forky_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_forky_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_forky_xfce_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_jammy_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_jammy_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_jammy_xfce_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_noble_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_noble_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_noble_xfce_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_plucky_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_plucky_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_plucky_xfce_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_trixie_gnome_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_trixie_mini_aarch64.rar
+          - set_vendor: armbian
+            set_rootfs: armbian_trixie_xfce_aarch64.rar
+
 
     steps:
       - name: Checkout
