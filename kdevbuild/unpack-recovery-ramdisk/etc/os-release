@@ -1,7 +1,0 @@
-NAME=Buildroot
-VERSION=linux-5.10-gen-rkr7.3-dirty
-ID=buildroot
-VERSION_ID=2021.11
-PRETTY_NAME="Buildroot 2021.11"
-ID_LIKE="recovery"
-RK_BUILD_INFO="liaokai@teamhd Thu Jan 23 11:28:48 CST 2025"

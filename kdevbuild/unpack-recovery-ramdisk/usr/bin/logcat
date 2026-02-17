@@ -1,2 +1,0 @@
-#!/bin/sh
-tail -f ${@:--n 99999999} /var/log/messages

@@ -1,5 +1,0 @@
-NAME=Buildroot
-VERSION=linux-5.10-gen-rkr7.3-dirty
-ID=buildroot
-VERSION_ID=2021.11
-PRETTY_NAME="Buildroot 2021.11"

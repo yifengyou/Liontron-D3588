@@ -70,7 +70,7 @@ jobs:
           ls -alh  /builder/release/*
           md5sum /builder/release/*
 
-      - name: Upload Image to Release
+      - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
         with:
           tag: D3588-kernel-6.6.y
@@ -79,11 +79,19 @@ jobs:
           removeArtifacts: false
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          body: | # kernel 6.6.y for D3588
+          body: | # D3588-kernel-6.6.y
 
-            当前发布为适配D3588的6.6.y内核构建输出，包括一下几个部分
-            1. Image 内核镜像
-            2. dtb 设备树
-            3. kos.tar.gz 内核模块压缩包
+            ## 发布内容
+            - **Image** - Linux 内核镜像
+            - **dtb/** - 设备树文件
+            - **kos.tar.gz** - 内核模块压缩包
 
+            ## 重要提示
+            > **此发布为中间构建产物，非完整固件！**
+            >
+            > **非专业开发人员请勿下载使用**
 
+            ## 免责声明
+            - **按原样提供**：镜像不作任何保证，使用风险自负
+            - **无官方关联**：与深圳亮钻科技有限公司无官方关系
+            - **安全提示**：请及时更新补丁、修改默认密码、配置防火墙

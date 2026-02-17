@@ -106,6 +106,14 @@ wget -c https://github.com/yifengyou/Liontron-D3588/releases/download/D3588-kern
 ls -alh Image
 md5sum Image
 
+wget -c https://github.com/yifengyou/Liontron-D3588/releases/download/D3588-kernel-6.6.y/config-6.6.y-kdev
+ls -alh config-6.6.y-kdev
+md5sum config-6.6.y-kdev
+
+wget -c https://github.com/yifengyou/Liontron-D3588/releases/download/D3588-kernel-6.6.y/System.map-6.6.y-kdev
+ls -alh System.map-6.6.y-kdev
+md5sum System.map-6.6.y-kdev
+
 wget -c https://github.com/yifengyou/Liontron-D3588/releases/download/D3588-kernel-6.6.y/rk3588-liontron-d3588.dtb
 ls -alh rk3588-liontron-d3588.dtb
 md5sum rk3588-liontron-d3588.dtb
@@ -138,8 +146,8 @@ mount boot.img /mnt
 mkdir -p /mnt/dtb
 cp -a rk3588-liontron-d3588.dtb /mnt/dtb/
 cp -f Image /mnt/vmlinuz-6.6.y-kdev
-# cp -f .config /mnt/config-6.6.y-kdev
-# cp -f ./System.map /mnt/System.map-6.6.y-kdev
+cp -f config-6.6.y-kdev /mnt/config-6.6.y-kdev
+cp -f System.map-6.6.y-kdev /mnt/System.map-6.6.y-kdev
 touch /mnt/initrd.img-6.6.y-kdev
 
 cat >/mnt/extlinux.conf <<EOF

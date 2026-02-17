@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# this file is a stub -- pm-functions will always fall back to kernel methods
-# if nothing else is available.
