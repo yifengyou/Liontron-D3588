@@ -219,36 +219,36 @@ md5sum ${WORKDIR}/rockdev/boot.img
 # template     : ${WORKDIR}/update_img_tmp/
 # output       : ${WORKDIR}/release/
 
-cd ${WORKDIR}
-git clone https://github.com/yifengyou/rockchip-tools.git rockchip-tools.git
-ls -alh ${WORKDIR}/rockchip-tools.git
-chmod +x ${WORKDIR}/rockchip-tools.git/afptool
-chmod +x ${WORKDIR}/rockchip-tools.git/rkImageMaker
+#cd ${WORKDIR}
+#git clone https://github.com/yifengyou/rockchip-tools.git rockchip-tools.git
+#ls -alh ${WORKDIR}/rockchip-tools.git
+#chmod +x ${WORKDIR}/rockchip-tools.git/afptool
+#chmod +x ${WORKDIR}/rockchip-tools.git/rkImageMaker
 
-mkdir -p ${WORKDIR}/release
-mkdir -p ${WORKDIR}/update_img_tmp
-cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588 \
-  ${WORKDIR}/update_img_tmp/RKDevTool
-mkdir -p ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-
-cp -a ${WORKDIR}/rockdev/uboot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-
-cd ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
-${WORKDIR}/rockchip-tools.git/afptool -pack . temp.img
-${WORKDIR}/rockchip-tools.git/rkImageMaker \
-  -RK3588 MiniLoaderAll.bin \
-  temp.img \
-  update.img \
-  -os_type:androidos
-find . -type f ! -name "update.img" -exec rm -f {} \;
-
-# generate update.img
-cd ${WORKDIR}/update_img_tmp/
-rar a ${WORKDIR}/release/${BUILD_TAG}_update.rar RKDevTool
-cd ${WORKDIR}/release/
-sha256sum ${BUILD_TAG}_update.rar
+#mkdir -p ${WORKDIR}/release
+#mkdir -p ${WORKDIR}/update_img_tmp
+#cp -a ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588 \
+#  ${WORKDIR}/update_img_tmp/RKDevTool
+#mkdir -p ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+#
+#cp -a ${WORKDIR}/rockdev/uboot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+#cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+#cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+#
+#cd ${WORKDIR}/update_img_tmp/RKDevTool/rockdev/image/
+#${WORKDIR}/rockchip-tools.git/afptool -pack . temp.img
+#${WORKDIR}/rockchip-tools.git/rkImageMaker \
+#  -RK3588 MiniLoaderAll.bin \
+#  temp.img \
+#  update.img \
+#  -os_type:androidos
+#find . -type f ! -name "update.img" -exec rm -f {} \;
+#
+## generate update.img
+#cd ${WORKDIR}/update_img_tmp/
+#rar a ${WORKDIR}/release/${BUILD_TAG}_update.rar RKDevTool
+#cd ${WORKDIR}/release/
+#sha256sum ${BUILD_TAG}_update.rar
 
 #==========================================================================#
 # Script Purpose: Generate Rockchip Firmware Image with RKDevTool          #
@@ -272,11 +272,11 @@ sha256sum ${BUILD_TAG}_update.rar
 # rootfs.img   : ${WORKDIR}/rockdev/rootfs.img
 # uboot.img    : ${WORKDIR}/rockdev/uboot.img
 # boot.img     : ${WORKDIR}/rockdev/boot.img
-# RKDevTool    : ${WORKDIR}/rockchip-tools.git/RKDevTool-v3.19-RK3588/
-# afptool      : ${WORKDIR}/rockchip-tools.git/afptool
-# rkImageMaker : ${WORKDIR}/rockchip-tools.git/rkImageMaker
-# template     : ${WORKDIR}/update_img_tmp/
 # output       : ${WORKDIR}/release/
+
+cd ${WORKDIR}
+git clone https://github.com/yifengyou/rockchip-tools.git rockchip-tools.git
+ls -alh ${WORKDIR}/rockchip-tools.git
 
 mkdir -p ${WORKDIR}/release
 mkdir -p ${WORKDIR}/rockdev_img_tmp
@@ -289,9 +289,9 @@ cp -a ${WORKDIR}/rockdev/boot.img ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/i
 cp -a ${WORKDIR}/rockdev/rootfs.img ${WORKDIR}/rockdev_img_tmp/RKDevTool/rockdev/image/
 
 cd ${WORKDIR}/rockdev_img_tmp/
-rar a ${WORKDIR}/release/${BUILD_TAG}_rockdev.rar RKDevTool
+rar a ${WORKDIR}/release/${BUILD_TAG} RKDevTool
 cd ${WORKDIR}/release/
-sha256sum ${BUILD_TAG}_rockdev.rar
+sha256sum ${BUILD_TAG}
 
 ls -alh ${WORKDIR}/release/
 
