@@ -70,26 +70,13 @@ ls -alh ${WORKDIR}/rockdev/rootfs.img
 #==========================================================================#
 #                        build uboot                                       #
 #==========================================================================#
-cd ${WORKDIR}/
-# https://github.com/yifengyou/d3588-uboot.git fork from radxa/u-boot.git
-# git clone -b stable-5.10-rock5 https://github.com/yifengyou/d3588-uboot.git u-boot.git
-git clone -b stable-5.10-rock5 https://github.com/radxa/u-boot.git u-boot.git
-cd u-boot.git
-ls -alh
+cd ${WORKDIR}
 
-# apply patch
-if ls "${WORKDIR}/radxa-uboot/"*.patch >/dev/null 2>&1; then
-  git config --global user.name yifengyou
-  git config --global user.email 842056007@qq.com
-  git am ${WORKDIR}/radxa-uboot/*.patch
-fi
+mkdir -p D3588-kernel-6.6.y
+cd D3588-kernel-6.6.y
 
-# build uboot.img
-chmod +x ${WORKDIR}/radxa-uboot/d3588.sh
-cp -a ${WORKDIR}/radxa-uboot/d3588.sh .
-cat d3588.sh
-./d3588.sh
-
+wget -c https://github.com/yifengyou/Liontron-D3588/releases/download/D3588-kernel-6.6.y/uboot.img
+ls -alh uboot.img
 mv uboot.img ${WORKDIR}/rockdev/uboot.img
 ls -alh ${WORKDIR}/rockdev/uboot.img
 md5sum ${WORKDIR}/rockdev/uboot.img

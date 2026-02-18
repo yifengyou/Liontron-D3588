@@ -34,7 +34,33 @@ apt-get install -qq -y --no-install-recommends \
 localedef -i zh_CN -f UTF-8 zh_CN.UTF-8 || true
 mkdir -p ${WORKDIR}/rockdev
 mkdir -p ${WORKDIR}/release
-mkdir -p /dev
+
+#==========================================================================#
+#                        build uboot                                       #
+#==========================================================================#
+cd ${WORKDIR}/
+# https://github.com/yifengyou/d3588-uboot.git fork from radxa/u-boot.git
+# git clone -b stable-5.10-rock5 https://github.com/yifengyou/d3588-uboot.git u-boot.git
+git clone -b stable-5.10-rock5 https://github.com/radxa/u-boot.git u-boot.git
+cd u-boot.git
+ls -alh
+
+# apply patch
+if ls "${WORKDIR}/radxa-uboot/"*.patch >/dev/null 2>&1; then
+  git config --global user.name yifengyou
+  git config --global user.email 842056007@qq.com
+  git am ${WORKDIR}/radxa-uboot/*.patch
+fi
+
+# build uboot.img
+chmod +x ${WORKDIR}/radxa-uboot/d3588.sh
+cp -a ${WORKDIR}/radxa-uboot/d3588.sh .
+cat d3588.sh
+./d3588.sh
+
+mv uboot.img ${WORKDIR}/release/uboot.img
+ls -alh ${WORKDIR}/release/uboot.img
+md5sum ${WORKDIR}/release/uboot.img
 
 #==========================================================================#
 #                        build kernel                                      #

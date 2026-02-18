@@ -85,6 +85,7 @@ jobs:
             - **Image** - Linux 内核镜像
             - **dtb/** - 设备树文件
             - **kos.tar.gz** - 内核模块压缩包
+            - **uboot.img** - radxa/u-boot.git
 
             ## 重要提示
             > **此发布为中间构建产物，非完整固件！**
