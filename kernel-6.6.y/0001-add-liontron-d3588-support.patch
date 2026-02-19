@@ -1,4 +1,4 @@
-From 8f9d0dccc870bc8648fbc8504b74dbf847bfa02b Mon Sep 17 00:00:00 2001
+From 7b2130fc786d3cd2f224b5bc24e13c76076545e6 Mon Sep 17 00:00:00 2001
 From: yifengyou <842056007@qq.com>
 Date: Sun, 8 Feb 2026 01:44:07 +0000
 Subject: [PATCH] add liontron d3588 support
@@ -6,9 +6,9 @@ Subject: [PATCH] add liontron d3588 support
 Signed-off-by: yifengyou <842056007@qq.com>
 ---
  arch/arm64/boot/dts/rockchip/Makefile         |    1 +
- .../dts/rockchip/rk3588-liontron-d3588.dts    |  919 ++
+ .../dts/rockchip/rk3588-liontron-d3588.dts    | 1258 +++
  arch/arm64/configs/liontron-d3588_defconfig   | 9635 +++++++++++++++++
- 3 files changed, 10555 insertions(+)
+ 3 files changed, 10894 insertions(+)
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
  create mode 100644 arch/arm64/configs/liontron-d3588_defconfig
 
@@ -25,10 +25,10 @@ index 14fb3ba50..38472096e 100644
  subdir-y	:= $(dts-dirs) overlay
 diff --git a/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
 new file mode 100644
-index 000000000..15f9a1ec8
+index 000000000..f048520b8
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
-@@ -0,0 +1,919 @@
+@@ -0,0 +1,1258 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
@@ -115,6 +115,8 @@ index 000000000..15f9a1ec8
 +	vbus5v0_typec: vbus5v0-typec-regulator {
 +		compatible = "regulator-fixed";
 +		enable-active-high;
++        regulator-boot-on;
++        regulator-always-on;
 +		gpio = <&gpio1 RK_PD2 GPIO_ACTIVE_HIGH>;
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&typec5v_pwren>;
@@ -136,6 +138,62 @@ index 000000000..15f9a1ec8
 +		vin-supply = <&vcc_3v3_s3>;
 +	};
 +
++
++
++	vcc5v0_ext: vcc5v0-ext {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc5v0_ext";
++		regulator-boot-on;
++		regulator-always-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		enable-active-high;
++		// gpio = <0xfe 0x00 0x00>;
++
++		gpio = <&gpio4 RK_PA0 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&vcc5v0_ext_en>;
++
++		vin-supply = <&vcc12v_dcin>;
++		status = "okay";
++	};
++
++	// kdev: for usb
++	vcc5v0_host: vcc5v0-host {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc5v0_host";
++		regulator-boot-on;
++		regulator-always-on;
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		enable-active-high;
++		vin-supply = <&vcc5v0_ext>;
++		status = "okay";
++	};
++
++	vcc3v3_sys: vcc3v3-sys {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc3v3_sys";
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		startup-delay-us = <100000>;
++		vin-supply = <&vcc12v_dcin>;
++	};
++
++
++	vcc3v3_pcie2x1l0: vcc3v3-pcie2x1l0-regulator {
++		compatible = "regulator-fixed";
++		regulator-name = "vcc3v3_pcie2x1l0";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on; // always on for pcie
++		startup-delay-us = <5000>;
++		vin-supply = <&vcc_3v3_s3>;
++	};
++
 +	fiq_debugger: fiq-debugger {
 +		compatible = "rockchip,fiq-debugger";
 +		rockchip,serial = <&uart2>;
@@ -145,6 +203,40 @@ index 000000000..15f9a1ec8
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&uart2m1_xfer>;
 +		status = "okay";
++	};
++
++	wireless-bluetooth {
++		compatible = "bluetooth-platdata";
++		clocks = <0x1d8>;
++		clock-names = "ext_clock";
++		uart_rts_gpios = <0xfe 0x14 0x01>;
++		pinctrl-names = "default\0rts_gpio";
++		pinctrl-0 = <0x1da 0x1db 0x1dc 0x1dd>;
++		pinctrl-1 = <0x1de>;
++		BT,reset_gpio = <0x1ae 0x0a 0x00>;
++		BT,wake_gpio = <0x1ae 0x09 0x00>;
++		BT,wake_host_irq = <0x1ae 0x00 0x00>;
++		status = "okay";
++	};
++
++	wireless_wlan: wireless-wlan {
++		compatible = "wlan-platdata";
++		wifi_chip_type = "ap6212";
++		pinctrl-names = "default";
++		pinctrl-0 = <&wifi_host_wake_irq>;
++		WIFI,host_wake_irq = <0x1ae 0x01 0x00>;
++		WIFI,poweren_gpio = <0x1ae 0x08 0x00>;
++		status = "okay";
++	};
++
++	sdio-pwrseq {
++		compatible = "mmc-pwrseq-simple";
++		clocks = <&xin32k>;
++		clock-names = "ext_clock";
++		pinctrl-names = "default";
++		pinctrl-0 = <&wifi_enable_h>;
++		post-power-on-delay-ms = <0xc8>;
++		reset-gpios = <0x1ae 0x08 0x01>;
 +	};
 +};
 +
@@ -307,62 +399,52 @@ index 000000000..15f9a1ec8
 +	};
 +};
 +
-+&i2c2 {
++&i2c1 {
 +	status = "okay";
-+
-+	vdd_npu_s0: regulator@42 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c1m2_xfer>;
++	rk8602@42 {
 +		compatible = "rockchip,rk8602";
 +		reg = <0x42>;
-+		rockchip,suspend-voltage-selector = <1>;
++		//vin-supply = <0x71>;
++		regulator-compatible = "rk860x-reg";
 +		regulator-name = "vdd_npu_s0";
-+		regulator-always-on;
++		regulator-min-microvolt = <0x86470>;
++		regulator-max-microvolt = <0xe7ef0>;
++		regulator-ramp-delay = <0x8fc>;
++		rockchip,suspend-voltage-selector = <0x01>;
 +		regulator-boot-on;
-+		regulator-min-microvolt = <550000>;
-+		regulator-max-microvolt = <950000>;
-+		regulator-ramp-delay = <2300>;
-+		vin-supply = <&vcc4v0_sys>;
-+
++		regulator-always-on;
 +		regulator-state-mem {
 +			regulator-off-in-suspend;
 +		};
 +	};
 +};
 +
++&i2c2 {
++	status = "disabled";
++};
++
++&i2c3 {
++	status = "disabled";
++};
++
++&i2c4 {
++	status = "disabled";
++};
++
++&i2c5 {
++	status = "okay";
++};
++
 +&i2c6 {
 +	clock-frequency = <200000>;
 +	status = "okay";
 +
-+	fusb302: typec-portc@22 {
-+		compatible = "fcs,fusb302";
-+		reg = <0x22>;
-+		interrupt-parent = <&gpio0>;
-+		interrupts = <RK_PD3 IRQ_TYPE_LEVEL_LOW>;
-+		pinctrl-0 = <&usbc0_int>;
-+		pinctrl-names = "default";
-+		vbus-supply = <&vbus5v0_typec>;
-+
-+		connector {
-+			compatible = "usb-c-connector";
-+			data-role = "dual";
-+			label = "USB-C";
-+			power-role = "dual";
-+			try-power-role = "sink";
-+			source-pdos = <PDO_FIXED(5000, 2000, PDO_FIXED_USB_COMM)>;
-+			sink-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
-+			op-sink-microwatt = <1000000>;
-+		};
-+	};
-+
-+	hym8563: rtc@51 {
-+		compatible = "haoyu,hym8563";
++	pcf8563@51 {
++		compatible = "nxp,pcf8563";
 +		reg = <0x51>;
-+		#clock-cells = <0>;
-+		clock-output-names = "hym8563";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&hym8563_int>;
-+		interrupt-parent = <&gpio0>;
-+		interrupts = <RK_PB0 IRQ_TYPE_LEVEL_LOW>;
-+		wakeup-source;
++		status = "okay";
 +	};
 +};
 +
@@ -370,66 +452,24 @@ index 000000000..15f9a1ec8
 +	clock-frequency = <200000>;
 +	status = "okay";
 +
-+	rt5616: codec@1b {
-+		compatible = "realtek,rt5616";
-+		reg = <0x1b>;
-+		clocks = <&cru I2S0_8CH_MCLKOUT>;
++	es8388@11 {
++		status = "okay";
++		#sound-dai-cells = <0x00>;
++		compatible = "everest,es8388 0everest,es8323";
++		reg = <0x11>;
++		clocks = <0x17b>;
 +		clock-names = "mclk";
-+		#sound-dai-cells = <0>;
-+		assigned-clocks = <&cru I2S0_8CH_MCLKOUT>;
-+		assigned-clock-rates = <12288000>;
-+
-+		port {
-+			rt5616_p0_0: endpoint {
-+				remote-endpoint = <&i2s0_8ch_p0_0>;
-+			};
-+		};
++		assigned-clocks = <0x17b>;
++		assigned-clock-rates = <0xbb8000>;
++		pinctrl-names = "default";
++		// pinctrl-0 = <0x17c>;
 +	};
-+
-+	/* connected with MIPI-CSI1 */
 +};
 +
 +&i2c8 {
-+	pinctrl-0 = <&i2c8m2_xfer>;
-+};
-+
-+&i2s0_8ch {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&i2s0_lrck
-+		     &i2s0_mclk
-+		     &i2s0_sclk
-+		     &i2s0_sdi0
-+		     &i2s0_sdo0>;
-+	status = "okay";
-+
-+	i2s0_8ch_p0: port {
-+		i2s0_8ch_p0_0: endpoint {
-+			dai-format = "i2s";
-+			mclk-fs = <256>;
-+			remote-endpoint = <&rt5616_p0_0>;
-+		};
-+	};
-+};
-+
-+&pcie2x1l0 {
 +	status = "disabled";
 +};
 +
-+&pcie2x1l1 {
-+	status = "disabled";
-+};
-+
-+&pcie2x1l2 {
-+	status = "disabled";
-+};
-+
-+&pcie30phy {
-+	status = "disabled";
-+};
-+
-+&pcie3x4 {
-+	status = "disabled";
-+};
 +
 +&pinctrl {
 +	gpio-leds {
@@ -456,7 +496,7 @@ index 000000000..15f9a1ec8
 +
 +	pcie {
 +		pcie2_0_rst: pcie2-0-rst {
-+			rockchip,pins = <4 RK_PB3 RK_FUNC_GPIO &pcfg_pull_none>;
++			rockchip,pins = <1 RK_PB3 RK_FUNC_GPIO &pcfg_pull_none>;
 +		};
 +
 +		pcie2_1_rst: pcie2-1-rst {
@@ -481,18 +521,59 @@ index 000000000..15f9a1ec8
 +			rockchip,pins = <4 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
 +		};
 +
-+		typec5v_pwren: typec5v-pwren {
-+			rockchip,pins = <1 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none>;
-+		};
-+
 +		usbc0_int: usbc0-int {
 +			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_up>;
 +		};
 +	};
++	// kdev: enable eth0
 +	rtl8211f {
 +			rtl8211f_rst: rtl8211f-rst {
 +					rockchip,pins = <3 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
 +			};
++	};
++	wireless-bluetooth {
++
++		uart9-gpios {
++			rockchip,pins = <0x04 0x14 0x00 0x18c>;
++		};
++
++		bt-reset-gpio {
++			rockchip,pins = <0x01 0x0a 0x00 0x18c>;
++		};
++
++		bt-wake-gpio {
++			rockchip,pins = <0x01 0x09 0x00 0x18c>;
++		};
++
++		bt-irq-gpio {
++			rockchip,pins = <0x01 0x00 0x00 0x195>;
++		};
++	};
++
++	wireless-wlan {
++		wifi_host_wake_irq: wifi-host-wake-irq {
++			rockchip,pins = <0x01 0x01 0x00 0x195>;
++		};
++	};
++
++	sdio-pwrseq {
++		wifi_enable_h: wifi-enable-h {
++			rockchip,pins = <0x01 0x08 0x00 0x191>;
++		};
++	};
++
++	vcc5v0-ext {
++		vcc5v0_ext_en: vcc5v0-ext-en {
++			// rockchip,pins = <0x04 0x00 0x00 0x18c>;
++			rockchip,pins = <4 RK_PA0 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++	usb-typec {
++		typec5v_pwren: typec5v-pwren {
++			// rockchip,pins = <0x01 0x04 0x00 0x18c>;
++			rockchip,pins = <1 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
 +	};
 +
 +};
@@ -532,6 +613,7 @@ index 000000000..15f9a1ec8
 +	status = "okay";
 +};
 +
++// kdev: spi2: spi@feb20000
 +&spi2 {
 +	status = "okay";
 +	assigned-clocks = <&cru CLK_SPI2>;
@@ -572,6 +654,90 @@ index 000000000..15f9a1ec8
 +
 +		gpio-controller;
 +		#gpio-cells = <2>;
++		pinctrl_rk806 {
++			gpio-controller;
++			#gpio-cells = <0x02>;
++
++			rk806_dvs1_null {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun0";
++			};
++
++			rk806_dvs1_slp {
++				pins = "gpio_pwrctrl1";
++				function = "pin_fun1";
++			};
++
++			rk806_dvs1_pwrdn {
++				pins = "gpio_pwrctrl1";
++				function = "pin_fun2";
++			};
++
++			rk806_dvs1_rst {
++				pins = "gpio_pwrctrl1";
++				function = "pin_fun3";
++			};
++
++			rk806_dvs2_null {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun0";
++			};
++
++			rk806_dvs2_slp {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun1";
++			};
++
++			rk806_dvs2_pwrdn {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun2";
++			};
++
++			rk806_dvs2_rst {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun3";
++			};
++
++			rk806_dvs2_dvs {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun4";
++			};
++
++			rk806_dvs2_gpio {
++				pins = "gpio_pwrctrl2";
++				function = "pin_fun5";
++			};
++
++			rk806_dvs3_null {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun0";
++			};
++
++			rk806_dvs3_slp {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun1";
++			};
++
++			rk806_dvs3_pwrdn {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun2";
++			};
++
++			rk806_dvs3_rst {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun3";
++			};
++
++			rk806_dvs3_dvs {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun4";
++			};
++
++			rk806_dvs3_gpio {
++				pins = "gpio_pwrctrl3";
++				function = "pin_fun5";
++			};
++		};
 +
 +		rk806_dvs1_null: dvs1-null-pins {
 +			pins = "gpio_pwrctrl1";
@@ -854,6 +1020,7 @@ index 000000000..15f9a1ec8
 +					regulator-off-in-suspend;
 +				};
 +			};
++
 +		};
 +	};
 +};
@@ -895,27 +1062,34 @@ index 000000000..15f9a1ec8
 +	status = "okay";
 +};
 +
-+// kdev: official dts check. ethernet@fe1b0000 disabled
++
++/* typec1 phy */
++&usbdp_phy1 {
++	status = "okay";
++};
++
++
++// kdev: ethernet@fe1b0000 disabled
 +&gmac0 {
 +	status = "disabled";
 +};
 +
-+// kdev: official dts check. ethernet@fe1c0000 okay
++// kdev: ethernet@fe1c0000 okay
 +&gmac1 {
-+        clock_in_out = "output";
-+        phy-handle = <&rgmii_phy>;
-+        phy-mode = "rgmii-rxid";
-+        pinctrl-0 = <&gmac1_miim
-+                     &gmac1_tx_bus2
-+                     &gmac1_rx_bus2
-+                     &gmac1_rgmii_clk
-+                     &gmac1_rgmii_bus>;
-+        pinctrl-names = "default";
-+        rx_delay = <0x00>;
-+        tx_delay = <0x43>;
-+        status = "okay";
++	local-mac-address = [9a 6a 31 fa 44 f5];
++	clock_in_out = "output";
++	phy-handle = <&rgmii_phy>;
++	phy-mode = "rgmii-rxid";
++	pinctrl-0 = <&gmac1_miim
++				 &gmac1_tx_bus2
++				 &gmac1_rx_bus2
++				 &gmac1_rgmii_clk
++				 &gmac1_rgmii_bus>;
++	pinctrl-names = "default";
++	status = "okay";
 +};
 +
++// kdev: ethernet@fe1c0000 okay
 +&mdio1 {
 +	rgmii_phy: ethernet-phy@1 {
 +			/* RTL8211F */
@@ -930,25 +1104,189 @@ index 000000000..15f9a1ec8
 +	};
 +};
 +
-+
++// kdev: ethernet@fe1c0000 okay
 +&gmac1_stmmac_axi_setup {
-+    snps,blen = <0 0 0 0 16 8 4>;
-+    snps,wr_osr_lmt = <4>;
-+    snps,rd_osr_lmt = <8>;
++	snps,blen = <0 0 0 0 16 8 4>;
++	snps,wr_osr_lmt = <4>;
++	snps,rd_osr_lmt = <8>;
 +};
 +
++// kdev: ethernet@fe1c0000 okay
 +&gmac1_mtl_rx_setup {
-+    snps,rx-queues-to-use = <2>;
-+    queue0 {};
-+    queue1 {};
++	snps,rx-queues-to-use = <2>;
++	queue0 {};
++	queue1 {};
 +};
 +
++// kdev: ethernet@fe1c0000 okay
 +&gmac1_mtl_tx_setup {
-+    snps,tx-queues-to-use = <2>;
-+    queue0 {};
-+    queue1 {};
++	snps,tx-queues-to-use = <2>;
++	queue0 {};
++	queue1 {};
 +};
-\ No newline at end of file
++
++// kdev: pcie2x1l0: pcie@fe170000 eth1
++&pcie2x1l0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pcie2_0_rst>;
++
++	// gpio1: gpio@fec20000
++	reset-gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_HIGH>;
++	// vpcie3v3-supply = <&vcc3v3_pcie2x1l0>;
++
++	// combphy1_ps: phy@fee10000
++	phys = <&combphy1_ps 2>;
++	phy-names = "pcie-phy";
++
++	status = "okay";
++};
++
++&combphy0_ps {
++	status = "okay";
++};
++
++&combphy1_ps {
++	status = "okay";
++};
++
++&combphy2_psu {
++	status = "okay";
++};
++
++// sdio: mmc@fe2d0000
++&sdio {
++	status = "okay";
++};
++
++
++&usb_host0_ehci {
++	status = "okay";
++};
++
++&usb_host0_ohci {
++	status = "okay";
++};
++
++&u2phy0 {
++	status = "okay";
++};
++
++&usbdp_phy0 {
++	status = "okay";
++};
++
++&u2phy0_otg {
++	status = "okay";
++};
++
++// kdev: usb_host0_xhci: usb@fc000000 okay
++// 刷机口
++&usb_host0_xhci {
++	compatible = "snps,dwc3";
++	reg = <0x0 0xfc000000 0x0 0x400000>;
++	interrupts-extended = <&gic GIC_SPI 220 IRQ_TYPE_LEVEL_HIGH 0>;
++
++
++    clocks = <&cru REF_CLK_USB3OTG0>,
++             <&cru SUSPEND_CLK_USB3OTG0>,
++             <&cru ACLK_USB3OTG0>;
++
++	clock-names = "ref", "suspend", "bus";
++	power-domains = <&power RK3588_PD_USB>;
++	resets = <&cru SRST_A_USB3OTG0>;
++	reset-names = "usb3-otg";
++	dr_mode = "otg";
++	// usbdp_phy0: phy@fed80000
++	// usb2phy0_grf: syscon@fd5d0000
++	phys = <&u2phy0_otg>, <&usbdp_phy0 PHY_TYPE_USB3>;
++	phys-names = "usb2-phy", "usb3-phy";
++	phy_type = "utmi_wide";
++	snps,dis_enblslpm_quirk;
++	snps,dis-u1-entry-quirk;
++	snps,dis-u2-entry-quirk;
++	snps,dis-u2-freeclk-exists-quirk;
++	snps,dis-del-phy-power-chg-quirk;
++	snps,dis-tx-ipgap-linecheck-quirk;
++	snps,parkmode-disable-hs-quirk;
++	snps,parkmode-disable-ss-quirk;
++	quirk-skip-phy-init;
++	status = "okay";
++	extcon = <&u2phy0>;
++};
++
++&u2phy1 {
++	status = "okay";
++};
++
++&usbdp_phy1 {
++	status = "okay";
++};
++
++&u2phy1_otg {
++	status = "okay";
++};
++
++// kdev: usb_host1_xhci: usb@fc400000 oaky
++&usb_host1_xhci {
++	compatible = "snps,dwc3";
++	reg = <0x00 0xfc400000 0x00 0x400000>;
++	// interrupts = <0x00 0xdd 0x04>;
++	interrupts-extended = <&gic GIC_SPI 221 IRQ_TYPE_LEVEL_HIGH 0>;
++
++	    clocks = <&cru REF_CLK_USB3OTG1>,
++                 <&cru SUSPEND_CLK_USB3OTG1>,
++                 <&cru ACLK_USB3OTG1>;
++	clock-names = "ref", "suspend", "bus_early", "phy";
++
++	power-domains = <&power RK3588_PD_USB>;
++	resets = <&cru SRST_A_USB3OTG1>;
++	reset-names = "usb3-otg";
++	dr_mode = "host";
++	// phys = <0x198 0x199>;
++	phys = <&u2phy1_otg>, <&usbdp_phy1 PHY_TYPE_USB3>;
++	phy-names = "usb2-phy usb3-phy";
++	phy_type = "utmi_wide";
++	snps,dis_enblslpm_quirk;
++	snps,dis-u1-entry-quirk;
++	snps,dis-u2-entry-quirk;
++	snps,dis-u2-freeclk-exists-quirk;
++	snps,dis-del-phy-power-chg-quirk;
++	snps,dis-tx-ipgap-linecheck-quirk;
++	snps,parkmode-disable-hs-quirk;
++	snps,parkmode-disable-ss-quirk;
++	status = "okay";
++};
++
++
++
++
++
++
++
++&u2phy2_host {
++	status = "okay";
++};
++
++
++
++&usb_host0_ohci {
++	status = "okay";
++};
++
++&usb_host1_ehci {
++	status = "okay";
++};
++
++&usb_host1_ohci {
++	status = "okay";
++};
++
++
++// kdev: usb_host2_xhci: usb@fcd00000 okay
++&usb_host2_xhci {
++	status = "disabled";
++};
++
 diff --git a/arch/arm64/configs/liontron-d3588_defconfig b/arch/arm64/configs/liontron-d3588_defconfig
 new file mode 100644
 index 000000000..dc0443067
@@ -10591,5 +10929,5 @@ index 000000000..dc0443067
 +# end of Rust hacking
 +# end of Kernel hacking
 -- 
-2.34.1
+2.43.0
 
