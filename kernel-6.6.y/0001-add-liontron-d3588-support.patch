@@ -1,4 +1,4 @@
-From 90dc79f34322a8315dc5b41e6cb31c1ab8e52b64 Mon Sep 17 00:00:00 2001
+From 1191d56849b5ec67d63f5389174c84e3a1e6ab53 Mon Sep 17 00:00:00 2001
 From: yifengyou <842056007@qq.com>
 Date: Sun, 8 Feb 2026 01:44:07 +0000
 Subject: [PATCH] add liontron d3588 support
@@ -6,17 +6,19 @@ Subject: [PATCH] add liontron d3588 support
 Signed-off-by: yifengyou <842056007@qq.com>
 ---
  arch/arm64/boot/dts/rockchip/Makefile         |    1 +
- .../dts/rockchip/rk3588-liontron-d3588.dts    | 1334 +++
+ .../dts/rockchip/rk3588-liontron-d3588.dts    | 1351 +++
  arch/arm64/configs/liontron-d3588_defconfig   | 9635 +++++++++++++++++
- 3 files changed, 10970 insertions(+)
+ include/linux/rfkill-wlan.h                   |   69 +
+ 4 files changed, 11056 insertions(+)
  create mode 100644 arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
  create mode 100644 arch/arm64/configs/liontron-d3588_defconfig
+ create mode 100644 include/linux/rfkill-wlan.h
 
 diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
-index 14fb3ba50..38472096e 100644
+index 414230a65..a9f6daade 100644
 --- a/arch/arm64/boot/dts/rockchip/Makefile
 +++ b/arch/arm64/boot/dts/rockchip/Makefile
-@@ -178,5 +178,6 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-nanopi-r6s.dtb
+@@ -179,5 +179,6 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-nanopi-r6s.dtb
  dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-nanopi-r6c.dtb
  dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-rock-5a.dtb
  dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-orangepi-5.dtb
@@ -25,10 +27,10 @@ index 14fb3ba50..38472096e 100644
  subdir-y	:= $(dts-dirs) overlay
 diff --git a/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
 new file mode 100644
-index 000000000..45010ded9
+index 000000000..77e8458f4
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3588-liontron-d3588.dts
-@@ -0,0 +1,1334 @@
+@@ -0,0 +1,1351 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
@@ -206,17 +208,18 @@ index 000000000..45010ded9
 +	};
 +
 +	// kdev: from official dts
-+	wireless-bluetooth {
++
++	wireless_bluetooth: wireless-bluetooth {
 +		compatible = "bluetooth-platdata";
-+		clocks = <0x1d8>;
++		//clocks = <0x1d8>;
 +		clock-names = "ext_clock";
-+		uart_rts_gpios = <0xfe 0x14 0x01>;
-+		pinctrl-names = "default\0rts_gpio";
-+		pinctrl-0 = <0x1da 0x1db 0x1dc 0x1dd>;
-+		pinctrl-1 = <0x1de>;
-+		BT,reset_gpio = <0x1ae 0x0a 0x00>;
-+		BT,wake_gpio = <0x1ae 0x09 0x00>;
-+		BT,wake_host_irq = <0x1ae 0x00 0x00>;
++		//uart_rts_gpios = <0xfe 0x14 0x01>;
++		pinctrl-names = "defaultrts_gpio";
++		//pinctrl-0 = <0x1da 0x1db 0x1dc 0x1dd>;
++		//pinctrl-1 = <0x1de>;
++		//BT,reset_gpio = <0x1ae 0x0a 0x00>;
++		//BT,wake_gpio = <0x1ae 0x09 0x00>;
++		//BT,wake_host_irq = <0x1ae 0x00 0x00>;
 +		status = "okay";
 +	};
 +
@@ -226,8 +229,8 @@ index 000000000..45010ded9
 +		wifi_chip_type = "ap6212";
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&wifi_host_wake_irq>;
-+		WIFI,host_wake_irq = <&gpio1 RK_PB1 GPIO_ACTIVE_HIGH>;
-+		WIFI,poweren_gpio = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
++		WIFI,host_wake_irq = <&gpio1 RK_PB1 GPIO_ACTIVE_LOW>;
++		WIFI,poweren_gpio = <&gpio1 RK_PB0 GPIO_ACTIVE_LOW>;
 +		status = "okay";
 +	};
 +
@@ -240,6 +243,10 @@ index 000000000..45010ded9
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&wifi_enable_h>;         // 原 0x1d9，对应 wifi-enable-h
 +		post-power-on-delay-ms = <200>;       // 0xc8 = 200ms 上电延时
++
++		//post-power-on-delay-ms = <500>;       /* 从200增加到500ms */
++		//power-off-delay-us = <100000>;        /* 新增：断电延时100ms */
++
 +		reset-gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_LOW>;  // 原 <0x1ae 0x08 0x01> GPIO1_B0 = 40
 +		// kdev, set LOW not HIGH
 +		status = "okay";
@@ -546,49 +553,46 @@ index 000000000..45010ded9
 +	/* 蓝牙无线模块 */
 +	wireless-bluetooth {
 +		uart9_gpios: uart9-gpios {
-+			rockchip,pins = <4 RK_PD4 RK_FUNC_GPIO &pcfg_pull_up>;
++			//rockchip,pins = <4 RK_PD4 RK_FUNC_GPIO &pcfg_pull_up>;
++			rockchip,pins = <0x04 0x14 0x00 0x18c>;
 +		};
 +
 +		bt_reset_gpio: bt-reset-gpio {
-+			rockchip,pins = <1 RK_PA2 RK_FUNC_GPIO &pcfg_output_low>;
++			//rockchip,pins = <1 RK_PA2 RK_FUNC_GPIO &pcfg_output_low>;
++			rockchip,pins = <0x01 0x0a 0x00 0x18c>;
 +		};
 +
 +		bt_wake_gpio: bt-wake-gpio {
-+			rockchip,pins = <1 RK_PA1 RK_FUNC_GPIO &pcfg_output_low>;
++			//rockchip,pins = <1 RK_PA1 RK_FUNC_GPIO &pcfg_output_low>;
++			rockchip,pins = <0x01 0x09 0x00 0x18c>;
 +		};
 +
 +		bt_irq_gpio: bt-irq-gpio {
-+			rockchip,pins = <1 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>;
++			//rockchip,pins = <1 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>;
++			rockchip,pins = <0x01 0x00 0x00 0x195>;
 +		};
 +	};
 +
 +	/* WiFi 无线模块 */
 +	wireless-wlan {
 +		wifi_host_wake_irq: wifi-host-wake-irq {
-+			rockchip,pins = <1 RK_PB1 RK_FUNC_GPIO &pcfg_pull_up>;
++			//rockchip,pins = <1 RK_PA1 RK_FUNC_GPIO 0x195>;
++			rockchip,pins = <0x01 0x01 0x00 0x195>;
 +		};
 +	};
 +
 +	/* SDIO 控制器引脚 - 使用 GPIO2 (官方 sdiom0) */
 +	sdio {
 +		sdiom0_pins: sdiom0-pins {
-+				/* 原始格式：
-+				 * <0x02 0x0b 0x02 0x18c> = GPIO2_B3, func=2, pull_none (CLK)
-+				 * <0x02 0x0a 0x02 0x191> = GPIO2_B2, func=2, pull_up   (CMD)
-+				 * <0x02 0x06 0x02 0x191> = GPIO2_B0, func=2, pull_up   (D0)
-+				 * <0x02 0x07 0x02 0x191> = GPIO2_B1, func=2, pull_up   (D1)
-+				 * <0x02 0x08 0x02 0x191> = GPIO2_C0, func=2, pull_up   (D2)
-+				 * <0x02 0x09 0x02 0x191> = GPIO2_C1, func=2, pull_up   (D3)
-+				 */
-+
-+				rockchip,pins =
-+					/* CLK */ <2 RK_PB3 2 &pcfg_pull_none>,
-+					/* CMD */ <2 RK_PB2 2 &pcfg_pull_up>,
-+					/* D0  */ <2 RK_PB0 2 &pcfg_pull_up>,
-+					/* D1  */ <2 RK_PB1 2 &pcfg_pull_up>,
-+					/* D2  */ <2 RK_PC0 2 &pcfg_pull_up>,
-+					/* D3  */ <2 RK_PC1 2 &pcfg_pull_up>;
-+			};
++			rockchip,pins = <
++				0x02 0x0b 0x02 0x18c   // CMD引脚
++				0x02 0x0a 0x02 0x191   // CLK时钟引脚
++				0x02 0x06 0x02 0x191   // DATA0
++				0x02 0x07 0x02 0x191   // DATA1
++				0x02 0x08 0x02 0x191   // DATA2
++				0x02 0x09 0x02 0x191   // DATA3
++			>;
++		};
 +	};
 +
 +	/* SDIO WiFi 电源序列控制 */
@@ -598,7 +602,8 @@ index 000000000..45010ded9
 +			// rockchip,pins = <0 RK_PA2 RK_FUNC_GPIO &pcfg_output_low>;
 +			//rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_output_high>;
 +			// rockchip,pins = <1 RK_PB0 0 &pcfg_pull_up>;
-+			rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_output_high>;
++			//rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO 0x191>;
++			rockchip,pins = <0x01 0x08 0x00 0x191>;
 +		};
 +	};
 +
@@ -623,6 +628,10 @@ index 000000000..45010ded9
 +		};
 +	};
 +
++};
++
++&sdiom1_pins {
++	status = "disabled";
 +};
 +
 +&pwm1 {
@@ -654,7 +663,7 @@ index 000000000..45010ded9
 +	disable-wp;
 +	no-mmc;
 +	no-sdio;
-+	sd-uhs-sdr104;
++	// sd-uhs-sdr104;
 +	vmmc-supply = <&vcc3v3_sd_s0>;
 +	vqmmc-supply = <&vccio_sd_s0>;
 +	status = "okay";
@@ -1213,7 +1222,9 @@ index 000000000..45010ded9
 +	no-mmc;
 +
 +	// 时钟频率限制
-+	max-frequency = <150000000>; // 150MHz
++	//max-frequency = <150000000>; // 150MHz
++	//max-frequency = <25000000>;
++	max-frequency = <25000000>;
 +
 +	/* 添加官方引脚配置 - 使用 GPIO2 (sdiom0) */
 +	pinctrl-names = "default";
@@ -1223,8 +1234,8 @@ index 000000000..45010ded9
 +	mmc-pwrseq = <&sdio_pwrseq>;
 +
 +	// 电源供应 - 根据硬件实际连接
-+	vmmc-supply = <&vcc3v3_sd_s0>;      // 3.3V 电源
-+	vqmmc-supply = <&vccio_sd_s0>;       // IO电压
++	//vmmc-supply = <&vcc3v3_sys>;      // 3.3V 电源
++	//vqmmc-supply = <&vcc_1v8_s3>;       // IO电压
 +
 +	// 如果需要CD引脚
 +	//cd-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_LOW>;
@@ -1363,6 +1374,15 @@ index 000000000..45010ded9
 +	status = "disabled";
 +};
 +
++
++&wireless_wlan {
++    status = "okay";
++};
++
++&wireless_bluetooth {
++    status = "okay";
++};
+\ No newline at end of file
 diff --git a/arch/arm64/configs/liontron-d3588_defconfig b/arch/arm64/configs/liontron-d3588_defconfig
 new file mode 100644
 index 000000000..dc0443067
@@ -11004,6 +11024,81 @@ index 000000000..dc0443067
 +#
 +# end of Rust hacking
 +# end of Kernel hacking
+diff --git a/include/linux/rfkill-wlan.h b/include/linux/rfkill-wlan.h
+new file mode 100644
+index 000000000..c1987c316
+--- /dev/null
++++ b/include/linux/rfkill-wlan.h
+@@ -0,0 +1,69 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __PLAT_BOARD_H
++#define __PLAT_BOARD_H
++
++#include <linux/types.h>
++#include <linux/init.h>
++#include <linux/device.h>
++#include <linux/clk.h>
++
++struct rksdmmc_iomux {
++    char    *name;  //set the MACRO of gpio
++    int     fgpio;
++    int     fmux;
++};
++
++struct rksdmmc_gpio {
++    int     io;                             //set the address of gpio
++    char    name[64];   //
++    int     enable;  // disable = !enable   //set the default value,i.e,GPIO_HIGH or GPIO_LOW
++    struct rksdmmc_iomux  iomux;
++};
++
++struct rksdmmc_pmu {
++    bool power_ctrl_by_pmu;
++    char pmu_regulator[20];
++    int  enable;
++};
++
++struct rksdmmc_gpio_wifi_moudle {
++    int sdio_vol;    //sdio reference voltage
++    bool vref_ctrl_enble;
++    bool wifi_power_remain;
++    struct rksdmmc_pmu    mregulator;
++    struct rksdmmc_pmu    ioregulator;
++    struct rksdmmc_gpio   vbat_n;
++    struct rksdmmc_gpio   power_n;  //PMU_EN  
++    struct rksdmmc_gpio   reset_n;  //SYSRET_B, DAIRST 
++    struct rksdmmc_gpio   vddio;
++    struct rksdmmc_gpio   bgf_int_b;
++    struct rksdmmc_gpio   wifi_int_b;
++    struct rksdmmc_gpio   gps_sync;
++    struct rksdmmc_gpio   ANTSEL2;  //pin5--ANTSEL2  
++    struct rksdmmc_gpio   ANTSEL3;  //pin6--ANTSEL3 
++    struct rksdmmc_gpio   GPS_LAN;  //pin33--GPS_LAN
++    struct regmap *grf;
++	struct clk *ext_clk;
++};
++
++#if IS_REACHABLE(CONFIG_RFKILL_RK)
++int rfkill_get_wifi_power_state(int *power);
++#else
++static inline int rfkill_get_wifi_power_state(int *power)
++{
++	return -1;
++}
++#endif
++void *rockchip_mem_prealloc(int section, unsigned long size);
++int rfkill_set_wifi_bt_power(int on);
++int rockchip_wifi_power(int on);
++int rockchip_wifi_set_carddetect(int val);
++int rockchip_wifi_get_oob_irq(void);
++int rockchip_wifi_get_oob_irq_flag(void);
++int rockchip_wifi_reset(int on);
++int rockchip_wifi_mac_addr(unsigned char *buf);
++void *rockchip_wifi_country_code(char *ccode);
++int rfkill_wlan_init(void);
++void rfkill_wlan_exit(void);
++
++#endif
 -- 
-2.34.1
+2.43.0
 
